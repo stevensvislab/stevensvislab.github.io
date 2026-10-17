@@ -18,6 +18,7 @@ export interface Site {
   shortName: string;
   url: string;
   email: string;
+  googleSiteVerification?: string;
   mission: string;
   announcement: { show: boolean; text: string; link?: string; linkText?: string };
   whatWeDo: string[];

@@ -60,6 +60,7 @@ const jsonLdText = jsonLd ? JSON.stringify(jsonLd).replace(/</g, "\\u003c") : un
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    {site.googleSiteVerification && <meta name="google-site-verification" content={site.googleSiteVerification} />}
     <link rel="canonical" href={canonical} />
     <link rel="preload" href={nunitoSans} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={nationalPark} as="font" type="font/woff2" crossorigin />
