@@ -1,0 +1,49 @@
+# Lab members (/people/ and the People summary on the home page).
+#
+# group (decides the section): faculty | phd | ms | undergrad | visiting | alumni | pet
+# photo: a square image in public/people/ (about 500×500 px). Leave it out to show a contour placeholder.
+# links (all optional): site, email, scholar, github, linkedin, bluesky, x. Any other key fails the build.
+# When someone graduates: set `group: alumni`, and add `end` and `now_at`.
+#
+# Example:
+# - id: jane-doe                               # used in links: /people/#jane-doe
+#   name: Jane Doe                             # must match the spelling in paper author lists
+#   first: Jane                                # shown on the photo
+#   role: PhD Student, CS
+#   group: phd
+#   photo: jane-doe.jpg
+#   interests: Visual analytics, Knowledge graphs, Rock climbing
+#   links:
+#     site: https://janedoe.com
+#     email: jdoe@stevens.edu
+#     scholar: https://scholar.google.com/citations?user=...
+#     github: https://github.com/janedoe
+#     linkedin: https://www.linkedin.com/in/janedoe/
+#     bluesky: https://bsky.app/profile/janedoe.bsky.social
+#     x: https://x.com/janedoe
+#   start: 2027
+#   # end: 2032
+#   # now_at: Company or University
+
+- id: adam-coscia
+  name: Adam Coscia
+  first: Adam
+  role: Assistant Professor, CS
+  group: faculty
+  photo: adam-coscia.jpg
+  interests: Visual Analytics, Sensemaking, AI, Coffee, Snowboarding
+  links:
+    site: https://adamcoscia.com
+    email: acoscia@stevens.edu
+    scholar: https://scholar.google.com/citations?user=diVuti8AAAAJ
+    linkedin: https://www.linkedin.com/in/adam-coscia/
+    github: https://github.com/AdamCoscia
+  start: 2026
+
+- id: meng-tang
+  name: Meng Lincoln Ngy Tang
+  first: Meng
+  role: Undergrad, CS
+  group: undergrad
+  interests: Financial visualization, Lending
+  start: 2026

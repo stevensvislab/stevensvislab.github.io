@@ -1,0 +1,67 @@
+---
+/**
+ * A research theme, Data Semantics Lab style, full width: name → description →
+ * topics and applications side by side → selected projects as compact paper cards.
+ */
+import type { Paper, Theme } from "../lib/site";
+import PaperCompact from "./PaperCompact.astro";
+
+interface Props {
+  theme: Theme;
+  papers: Paper[];
+}
+const { theme, papers } = Astro.props;
+const t = theme.data;
+const byId = new Map(papers.map((p) => [p.id, p]));
+---
+
+<article class="theme-block" style={`--c: var(--${t.color})`} id={theme.id}>
+  <h3><span class="highlight">{t.name}</span></h3>
+  <p class="desc">{t.description}</p>
+  <dl class="facets">
+    <div>
+      <dt>Topics</dt>
+      <dd>{t.topics.join(" · ")}</dd>
+    </div>
+    <div>
+      <dt>Applications</dt>
+      <dd>{t.applications.join(" · ")}</dd>
+    </div>
+  </dl>
+  <div class="selected">
+    <p class="lead">Selected projects</p>
+    <ul>
+      {
+        t.selected.map((slug) => (
+          <li>
+            <PaperCompact paper={byId.get(slug)!} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</article>
+
+<style>
+  .theme-block { padding: 1.4rem 0 1.6rem; }
+  .theme-block + .theme-block { border-top: 1px solid var(--rule); }
+  h3 { font-size: 1.4rem; margin-bottom: 0.7rem; color: color-mix(in srgb, var(--c) 80%, var(--ink)); }
+  /* A soft rounded marker stroke: it sits under the lower part of the text and runs a little past its end. */
+  .highlight {
+    padding: 0 0.9em 0 0.15em;
+    margin-left: -0.15em;
+    border-radius: 0.4em;
+    background: linear-gradient(transparent 62%, color-mix(in srgb, var(--c) 22%, transparent) 62%);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  .desc { color: var(--ink-2); }
+  .facets { margin: 0 0 1.2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; font-size: 0.92rem; }
+  dt { font-weight: 800; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.2rem; }
+  dd { margin: 0; color: var(--ink-2); }
+  .selected .lead { margin: 0 0 0.2rem; }
+  .selected ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: 0 1.6rem; }
+  @media (max-width: 640px) {
+    .facets { grid-template-columns: 1fr; gap: 0.8rem; }
+  }
+</style>

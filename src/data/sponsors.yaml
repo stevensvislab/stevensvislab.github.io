@@ -1,0 +1,7 @@
+# Funders of lab research (home page and About). The Sponsors sections stay hidden while this list is empty.
+#
+# Example:
+# - name: National Science Foundation
+#   url: https://www.nsf.gov
+#   logo: nsf.svg                              # optional: file in public/logos/
+#   blurb: Award #1234567                      # optional

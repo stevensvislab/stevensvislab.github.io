@@ -1,0 +1,73 @@
+---
+/**
+ * One publication in the IDL style: teaser on the left, citation on the right.
+ * On narrow screens the teaser stacks above the text.
+ */
+import type { Paper, Person } from "../lib/site";
+import Authors from "./Authors.astro";
+import PaperLinks from "./PaperLinks.astro";
+import Pills from "./Pills.astro";
+import Teaser from "./Teaser.astro";
+
+interface Props {
+  paper: Paper;
+  people: Map<string, Person>;
+  headingLevel?: "h3" | "h4";
+}
+const { paper, people, headingLevel: H = "h3" } = Astro.props;
+const d = paper.data;
+---
+
+<article class="paper-entry" id={paper.id}>
+  <a class="thumb" href={`/papers/${paper.id}/`} tabindex="-1" aria-hidden="true">
+    <Teaser paper={paper} width={190} />
+  </a>
+  <div class="body">
+    <H class="title"><a href={`/papers/${paper.id}/`}>{d.title}</a></H>
+    <p class="cite-line">
+      <Authors authors={d.authors} people={people} />
+      <span class="venue">{d.venueFull}</span>
+    </p>
+    {d.award && <p class="award"><span class="blaze">{d.award}</span></p>}
+    <Pills paper={paper} />
+    <PaperLinks paper={paper} />
+  </div>
+</article>
+
+<style>
+  .paper-entry {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 1.25rem;
+    padding: 1rem 0;
+  }
+  .thumb {
+    display: block;
+    width: 190px;
+    aspect-ratio: 190 / 106;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+    margin-top: 0.2rem;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .thumb:hover { box-shadow: 2px 2px 18px color-mix(in srgb, var(--stevens) 35%, transparent); transform: translateY(-1px); }
+  .body { display: flex; flex-direction: column; gap: 0.4rem; min-width: 0; }
+  .title {
+    font-family: var(--font-body);
+    font-size: 1.02rem;
+    font-weight: 800;
+    line-height: 1.32;
+    margin: 0;
+    letter-spacing: 0;
+  }
+  .title a { text-decoration: none; }
+  .title a:hover { text-decoration: underline; }
+  .cite-line { margin: 0; font-size: 0.92rem; line-height: 1.5; color: var(--ink-2); }
+  .venue { display: block; font-style: italic; color: var(--muted); }
+  .award { margin: 0; }
+  @media (max-width: 600px) {
+    .paper-entry { grid-template-columns: 1fr; gap: 0.6rem; }
+    .thumb { width: 100%; max-width: 360px; }
+  }
+</style>

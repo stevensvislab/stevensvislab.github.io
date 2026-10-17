@@ -1,0 +1,79 @@
+# News (home page and /news/). The site sorts by date; items in the same month keep this file's order.
+# `text` supports **bold**, *italic*, and [links](url). Link a paper page with [Title](/papers/<slug>/).
+#
+# Example:
+# - date: 2027-04-15
+#   text: "[*OnGoal*](/papers/ongoal/) won a **Best Paper Award** at CHI 2027! 🎉"
+
+- date: 2026-10-01
+  text: "**CS 538: Data Visualization** is coming to Stevens in Spring 2027!"
+- date: 2026-09-01
+  text: "The **Stevens Visualization Lab** opens its doors at Stevens Institute of Technology! 🧭"
+- date: 2026-09-01
+  text: "[AgentK](/papers/agentk-vast/) received a VAST Challenge 2026 Honorable Mention for Intuitive Human-AI Interactions."
+- date: 2026-08-01
+  text: "[Less Is More](/papers/less-is-more/) accepted to ACM UIST 2026 in Detroit!"
+- date: 2026-04-27
+  text: "Adam defended his dissertation, [Detecting and Mitigating Pedagogical Risks in Large Language Models with Visual Analytics](https://adamcoscia.com/dissertation/), at Georgia Tech. 🎓"
+- date: 2026-04-01
+  text: "[DraftMarks](/papers/draftmarks/) appears at ACM CHI 2026 in Barcelona, and was featured by Georgia Tech Research."
+
+- date: 2025-10-01
+  text: "Gave an [invited talk](https://youtu.be/wGPD1qWFF-s) at Brown University! You can watch the [recording](https://youtu.be/wGPD1qWFF-s) on Youtube ▶️"
+- date: 2025-08-01
+  text: "[*VisPile*](/papers/vispile/) accepted to [HICSS 59](https://hicss.hawaii.edu/) in Lahaina, Hawai'i! See you there! 🏄"
+- date: 2025-07-01
+  text: "[*OnGoal*](/papers/ongoal/) accepted to [ACM UIST 2025](https://uist.acm.org/2025/) in Busan, Korea! Let me know if you're going! 🌸"
+- date: 2025-05-01
+  text: "Started summer internship at [MIT Lincoln Lab](https://www.ll.mit.edu/careers/student-opportunities/summer-research-program) in Lexington, Massachusetts! 📡"
+- date: 2025-04-01
+  text: "Gave an [invited lightning talk](https://www.linkedin.com/feed/update/urn:li:activity:7330670132739936259/) on my dissertation at the Georgia Tech IPAT:GVU seminar series! Check out the slides [here](https://adamcoscia.com/talks/Coscia%20-%20GaTech%20IPAT%20GVU%20Talk%20-%20Apr%202025.pdf)"
+- date: 2025-02-01
+  text: "[*VisPile*](/papers/vispile/24-las-vispile-poster.pdf) received Best Poster award at [CRIDC 2025!](https://grad.gatech.edu/cridc) 🎉"
+
+- date: 2024-11-01
+  text: "Honored to be selected as a 2024 [Foley Scholars Awards](https://research.gatech.edu/foley-scholars-2024-winners-and-finalists) finalist! 🎉"
+- date: 2024-10-01
+  text: "I will present two papers, [*Guidelines for Integration During Visual Analytics*](/papers/guidelines/) and [*KnowledgeVIS,*](/papers/knowledgevis/) at [IEEE VIS 2024](https://ieeevis.org/year/2024/welcome) in St Pete Beach, Florida! Let's connect! 🌊"
+- date: 2024-09-01
+  text: "Passed my [PhD Dissertation Proposal Defense!](https://www.cc.gatech.edu/degree-programs/phd-human-centered-computing) I am officially a PhD candidate!! 🎉"
+- date: 2024-05-01
+  text: "Started summer internship at [Adobe Research](https://research.adobe.com/) in San Jose, California! ☀️"
+- date: 2024-02-01
+  text: "Presented poster for [*iScore*](/papers/iscore/iScore_CRIDC_2024.pdf) at [CRIDC 2024!](https://grad.gatech.edu/cridc)"
+- date: 2024-02-01
+  text: "[*DeepSee*](/papers/deepsee/) accepted to [ACM CHI 2024](https://chi2024.acm.org/) in Honolulu, Hawai'i! See you there! 🌺"
+- date: 2024-01-01
+  text: "[*iScore*](/papers/iscore/) accepted to [ACM IUI 2024](https://iui.acm.org/2024/) in Greenville, South Carolina! Come say hi! 🌲"
+
+- date: 2023-12-01
+  text: "Two papers accepted to IEEE TVCG! [*Guidelines for Integration During Visual Analytics*](/papers/guidelines/) and [*KnowledgeVIS*](/papers/knowledgevis/) 📜"
+- date: 2023-06-01
+  text: "Started summer internship at [NASA Jet Propulsion Laboratory](https://www.jpl.nasa.gov/) in Pasadena, California! 🌴"
+- date: 2023-04-01
+  text: "Presented my work at the Georgia Tech [GVU Research Showcase](https://aialoe.org/coscia-presents-visualizations-for-interpreting-large-language-models/) Spring 2023"
+- date: 2023-02-01
+  text: "[*KnowledgeVIS*](/papers/knowledgevis/KnowledgeVIS_CRIDC_2023.pdf) received Best Poster award at [CRIDC 2023!](https://grad.gatech.edu/cridc) 🎉"
+
+- date: 2022-11-01
+  text: "Presented my work at the Georgia Tech [GVU Research Showcase (@ 0:40s)](https://twitter.com/GT_Vis/status/1588237174708707328) Fall 2022"
+- date: 2022-10-01
+  text: "I will attend [IEEE VIS 2022](https://ieeevis.org/year/2022/welcome) in-person in Oklahoma City, Oklahoma, USA. Let's meet up! 🐂"
+- date: 2022-04-01
+  text: "Passed my [PhD Qualifying Exam!](https://www.cc.gatech.edu/degree-programs/phd-human-centered-computing) 🎉"
+
+- date: 2021-07-01
+  text: "Two papers accepted to IEEE VIS 2021! [*Left, Right, and Gender*](/papers/lrg/) and [*Lumos*](/papers/lumos/)"
+- date: 2021-06-01
+  text: "Started remote summer internship at [NASA Jet Propulsion Laboratory!](https://datavis.caltech.edu/) 🚀"
+- date: 2021-02-01
+  text: "[*Lumos*](/papers/lumos/lumos_cridc_2021.pdf) received Best Poster award at [CRIDC 2021!](https://grad.gatech.edu/cridc) 🎉"
+
+- date: 2020-10-01
+  text: "Presented workshop paper, [*Bias-Aware Visual Analytics,*](/papers/biasfuture/) at [TREX](https://trexvis.github.io/Workshop2020/) workshop @ IEEE VIS 2020"
+- date: 2020-08-01
+  text: "Joined the [Human-Centered Computing PhD program](https://www.cc.gatech.edu/degree-programs/phd-human-centered-computing) and the [Visual Analytics Lab](https://gtvalab.github.io/) @ [Georgia Tech!](https://www.gatech.edu/)"
+- date: 2020-08-01
+  text: "Honored to receive the [President's Fellowship](https://grad.gatech.edu/presidents-fellowship) @ [Georgia Tech!](https://www.gatech.edu/) 🎉"
+- date: 2020-06-01
+  text: "Published an article: [*What is Data Science, How Does it Work, and Why is it Important?*](https://www.ewaab.org/post/what-is-data-science-how-does-it-work-and-why-is-it-important)"

@@ -1,0 +1,14 @@
+# private source material (not site content)
+notes/
+personalsite/
+
+# build output and dependencies
+node_modules/
+dist/
+.astro/
+
+# env and OS files
+.env
+.env.*
+.DS_Store
+Thumbs.db

@@ -1,0 +1,216 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import Carousel from "../components/Carousel.astro";
+import Contours from "../components/Contours.astro";
+import { HERO } from "../graphics/contourSets";
+import Icon from "../components/Icon.astro";
+import NewsList from "../components/NewsList.astro";
+import PaperCompact from "../components/PaperCompact.astro";
+import PeopleSummary from "../components/PeopleSummary.astro";
+import ThemeBlock from "../components/ThemeBlock.astro";
+import { brandHtml, getPapers, getThemes, inlineMd, site } from "../lib/site";
+
+const papers = await getPapers();
+const themes = await getThemes();
+const featured = papers.filter((p) => p.data.featured);
+const recent = papers.slice(0, 6);
+const courses = await getCollection("courses");
+const sponsors = await getCollection("sponsors");
+
+// IDL-style run-in: "OUR MISSION is to help people…"
+const mission = site.mission.replace(/^Our mission\s+/i, "");
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+const jsonLd = [
+  { "@context": "https://schema.org", "@type": "WebSite", name: site.name, alternateName: site.shortName, url: site.url },
+  {
+    "@context": "https://schema.org",
+    "@type": "ResearchOrganization",
+    name: site.name,
+    alternateName: site.shortName,
+    url: site.url,
+    description: site.mission.replace(/\*\*/g, ""),
+    email: site.email,
+    sameAs: [site.github],
+    parentOrganization: { "@type": "CollegeOrUniversity", name: site.institution.name, url: site.institution.url },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: site.location.street,
+      addressLocality: "Hoboken",
+      addressRegion: "NJ",
+      postalCode: "07030",
+      addressCountry: "US",
+    },
+  },
+];
+---
+
+<Base editPath="src/pages/index.astro" topContours={false} jsonLd={jsonLd}>
+  <section class="hero">
+    <Contours {...HERO} class="hero-contours" />
+    <div class="wrap hero-inner">
+      <h1 set:html={brandHtml(site.name)} />
+      <p class="mission">
+        <a href="/about/"><span class="lead">Our mission</span></a>
+        <span set:html={inlineMd(mission)} />
+      </p>
+    </div>
+  </section>
+
+  {
+    featured.length > 0 && (
+      <div class="wrap">
+        <Carousel papers={featured} />
+      </div>
+    )
+  }
+
+  <div class="wrap">
+    <div class="columns section">
+      <div class="left">
+        <section aria-labelledby="what-we-do">
+          <h2 id="what-we-do" class="waypoint"><Icon name="mountain" />What we do</h2>
+          {
+            site.announcement.show && (
+              <div class="callout">
+                <Icon name="information" />
+                <p>
+                  <span set:html={inlineMd(site.announcement.text)} />{" "}
+                  {site.announcement.link && <a href={site.announcement.link}>{site.announcement.linkText ?? "Learn more"} →</a>}
+                </p>
+              </div>
+            )
+          }
+          {site.whatWeDo.map((para) => <p set:html={inlineMd(para)} />)}
+        </section>
+
+        <section aria-labelledby="recent-papers" class="recent">
+          <div class="section-head">
+            <h2 id="recent-papers" class="waypoint"><Icon name="binoculars" />Recent publications</h2>
+            <a class="more-link" href="/papers/">All papers</a>
+          </div>
+          <ul class="compact-list">
+            {recent.map((p) => <li><PaperCompact paper={p} /></li>)}
+          </ul>
+        </section>
+      </div>
+
+      <aside class="right" aria-labelledby="news">
+        <div class="section-head">
+          <h2 id="news" class="waypoint"><Icon name="information" />News</h2>
+          <a class="more-link" href="/news/">All news</a>
+        </div>
+        <NewsList limit={7} />
+      </aside>
+    </div>
+
+    <section class="section" aria-labelledby="research">
+      <div class="section-head">
+        <h2 id="research" class="waypoint"><Icon name="maps" />Research themes</h2>
+        <a class="more-link" href="/papers/">Explore all papers</a>
+      </div>
+      {/* The Research Map is hidden for now. To show it again, import ResearchMap from
+          "../components/ResearchMap.astro" and add: <ResearchMap themes={themes} papers={papers} /> */}
+      <div class="themes">
+        {themes.map((t) => <ThemeBlock theme={t} papers={papers} />)}
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="people">
+      <div class="section-head">
+        <h2 id="people" class="waypoint"><Icon name="guidedTours" />People</h2>
+        <a class="more-link" href="/people/">Meet the fellowship</a>
+      </div>
+      <PeopleSummary />
+    </section>
+
+    {
+      courses.length > 0 && (
+        <section class="section" aria-labelledby="courses">
+          <h2 id="courses" class="waypoint"><Icon name="brochure" />Courses</h2>
+          <ul class="courses">
+            {courses.map((c) => (
+              <li>
+                <details>
+                  <summary>
+                    <span class="code mono">{c.data.code}</span>
+                    <span class="ctitle">{c.data.title}</span>
+                    <span class="term">{c.data.terms.join(", ")} · {cap(c.data.type)} · {cap(c.data.level.join(", "))}</span>
+                  </summary>
+                  {c.data.description?.split(/\n\s*\n/).map((para) => <p>{para}</p>)}
+                </details>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      sponsors.length > 0 && (
+        <section class="section" aria-labelledby="sponsors">
+          <h2 id="sponsors" class="waypoint"><Icon name="star" />Sponsors</h2>
+          <ul class="logos">
+            {sponsors.map((s) => (
+              <li>
+                <a href={s.data.url} rel="noopener">
+                  {s.data.logo ? <img src={`/logos/${s.data.logo}`} alt={s.data.name} loading="lazy" /> : s.data.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 3rem 0 1.2rem;
+    isolation: isolate;
+  }
+  .hero :global(.hero-contours) {
+    z-index: -1;
+    mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.85), transparent 92%);
+    -webkit-mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.85), transparent 92%);
+  }
+  h1 { font-size: clamp(2.2rem, 5.6vw, 3.6rem); font-weight: 800; margin-bottom: 0.4rem; }
+  .mission { font-size: clamp(1.08rem, 2vw, 1.32rem); line-height: 1.5; margin: 0; }
+  .mission .lead { font-size: 0.9em; color: var(--ink); margin-right: 0.15em; }
+  .mission a { text-decoration: none; }
+  .mission a:hover .lead { color: var(--stevens); }
+  .mission :global(strong) { font-weight: 900; }
+
+  .columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 17.5rem);
+    gap: 3.2rem;
+    padding-top: 3rem;
+  }
+  .left > section + section { margin-top: 2.6rem; }
+  .compact-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.6rem; }
+  .themes { display: grid; gap: 1rem; }
+
+  .courses { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+  .courses details { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--card); padding: 0.8rem 1rem; }
+  .courses summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; align-items: baseline; }
+  .courses summary::marker { color: var(--stevens); }
+  .code { color: var(--stevens); font-weight: 700; }
+  .ctitle { font-weight: 800; font-size: 1.05rem; }
+  .term { font-size: 0.85rem; color: var(--muted); }
+  .courses p { margin: 0.8rem 0 0; color: var(--ink-2); font-size: 0.95rem; max-width: 52rem; }
+  .logos { list-style: none; display: flex; flex-wrap: wrap; gap: 1.5rem; padding: 0; }
+  .logos img { height: 48px; width: auto; }
+
+  @media (max-width: 960px) {
+    .columns { grid-template-columns: 1fr; gap: 2.4rem; }
+  }
+  @media (max-width: 600px) {
+    h1 { margin-bottom: 1rem; }
+    .compact-list { grid-template-columns: 1fr; }
+  }
+</style>

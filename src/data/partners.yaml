@@ -1,0 +1,14 @@
+# Partner labs and centers at Stevens (About and Join pages).
+#
+# Example:
+# - name: Stevens XR Lab
+#   url: https://www.stevens.edu/...
+#   logo: xr-lab.svg                           # optional: file in public/logos/
+#   blurb: One sentence about what the partner offers.   # optional
+
+- name: Hanlon Financial Systems Center
+  url: https://www.stevens.edu/school-business/hanlon-financial-systems-center
+  blurb: Industry-grade financial technology labs that replicate the tools used at finance companies.
+- name: Stevens XR Lab
+  url: https://www.stevens.edu/it/services/xrlab
+  blurb: Extended-reality spaces and equipment for immersive visualization and interaction.

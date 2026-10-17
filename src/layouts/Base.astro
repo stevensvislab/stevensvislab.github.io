@@ -1,0 +1,104 @@
+---
+import "@fontsource-variable/national-park";
+import "@fontsource-variable/nunito-sans";
+import "@fontsource-variable/nunito-sans/wght-italic.css";
+import "@fontsource/ibm-plex-mono/400.css";
+import "../styles/global.css";
+// Fetch the two main fonts right away, so text doesn't reflow (and push the page around) when they arrive.
+import nunitoSans from "@fontsource-variable/nunito-sans/files/nunito-sans-latin-wght-normal.woff2?url";
+import nationalPark from "@fontsource-variable/national-park/files/national-park-latin-wght-normal.woff2?url";
+import Contours from "../components/Contours.astro";
+import Footer from "../components/Footer.astro";
+import { topSpec } from "../graphics/contourSets";
+import Nav from "../components/Nav.astro";
+import { site } from "../lib/site";
+
+interface Props {
+  title?: string;
+  /** Leave the " | Lab name" off the page title (for long titles, like a paper's). */
+  bareTitle?: boolean;
+  description?: string;
+  /** Repo-relative source path for the footer's "Contribute on GitHub" link. */
+  editPath?: string;
+  /** Share-card image (1200×630) as a site path; defaults to /og/default.png. */
+  image?: string;
+  imageAlt?: string;
+  /** Ask search engines not to index this page. */
+  noindex?: boolean;
+  /** Extra <meta name=… content=…> tags (a name may repeat, e.g. citation_author). */
+  meta?: { name: string; content: string }[];
+  /** Structured data (schema.org) for search engines, as one object or a list. */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** Topographic contours behind the top of the page. Pages with their own hero contours turn this off. */
+  topContours?: boolean;
+}
+
+const {
+  title,
+  bareTitle = false,
+  description = "The Stevens Visualization Lab helps people make sense of complex data through the design of interactive systems for data visualization and analysis.",
+  editPath,
+  image = "/og/default.png",
+  imageAlt = `${site.name} at Stevens Institute of Technology`,
+  noindex = false,
+  meta = [],
+  jsonLd,
+  topContours = true,
+} = Astro.props;
+
+const fullTitle = title ? (bareTitle ? title : `${title} | ${site.name}`) : `${site.name} at Stevens Institute of Technology`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(image, Astro.site).href;
+// "<" is escaped so the JSON can never close its own <script> tag.
+const jsonLdText = jsonLd ? JSON.stringify(jsonLd).replace(/</g, "\\u003c") : undefined;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="preload" href={nunitoSans} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={nationalPark} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${site.name} blog`} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {meta.map((m) => <meta name={m.name} content={m.content} />)}
+    {jsonLdText && <script type="application/ld+json" set:html={jsonLdText} />}
+    <meta name="theme-color" content="#f7f4ec" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121816" media="(prefers-color-scheme: dark)" />
+    <script is:inline>
+      try {
+        const t = localStorage.getItem("svl-theme");
+        if (t === "dark" || t === "light") document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <Nav />
+    <main id="main">
+      {topContours && <Contours {...topSpec(Astro.url.pathname)} class="top-contours" />}
+      <slot />
+    </main>
+    <Footer editPath={editPath} />
+  </body>
+</html>

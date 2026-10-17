@@ -1,0 +1,167 @@
+---
+/**
+ * Fun: the photo carousel from datavisards (main frame, captions, prev/next,
+ * thumbnail strip, autoplay that pauses on hover) plus keyboard and swipe.
+ */
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import CultureList from "../components/CultureList.astro";
+import Icon from "../components/Icon.astro";
+
+const photos = (await getCollection("photos")).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const pets = (await getCollection("people")).filter((p) => p.data.group === "pet");
+---
+
+<Base title="Fun" description="Life in and around the Stevens Visualization Lab: lab outings, conference trips, the occasional hike, and our culture." editPath="src/data/photos.yaml">
+  <div class="wrap">
+    <header class="page-head">
+      <h1>Fun</h1>
+      <p class="subtitle">A glimpse of life on the trail.&nbsp;<Icon name="scenicViewpoint" /></p>
+    </header>
+
+    {
+      photos.length === 0 ? (
+        <div class="empty">
+          <Icon name="camera" />
+          <p>Our first photos are on the way. Check back after the lab's first expedition!</p>
+        </div>
+      ) : (
+        <section class="photo-carousel" data-photo-carousel data-autoplay="6000" aria-label="Lab photos">
+          <figure class="frame">
+            <img src={`/photos/${photos[0].data.file}`} alt={photos[0].data.alt} data-main />
+            <figcaption data-caption>{photos[0].data.caption}</figcaption>
+            <button type="button" class="nav prev" data-prev aria-label="Previous photo">‹</button>
+            <button type="button" class="nav next" data-next aria-label="Next photo">›</button>
+          </figure>
+          <div class="thumbs" role="list">
+            {photos.map((p, i) => (
+              <button
+                type="button"
+                role="listitem"
+                class="thumb"
+                data-thumb
+                data-src={`/photos/${p.data.file}`}
+                data-alt={p.data.alt}
+                data-caption={p.data.caption}
+                aria-current={i === 0 ? "true" : "false"}
+                aria-label={p.data.caption}
+              >
+                <img src={`/photos/${p.data.file}`} alt="" loading="lazy" />
+              </button>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {pets.length > 0 && <p class="pets-link">Meet our pets on the <a href="/people/#pets">People</a> page.</p>}
+
+    <section class="section culture" aria-labelledby="culture">
+      <h2 id="culture" class="waypoint"><Icon name="campground" />Lab culture</h2>
+      <div class="prose">
+        <CultureList level="h3" />
+      </div>
+    </section>
+  </div>
+</Base>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>("[data-photo-carousel]")) {
+    const main = root.querySelector<HTMLImageElement>("[data-main]")!;
+    const caption = root.querySelector<HTMLElement>("[data-caption]")!;
+    const thumbs = [...root.querySelectorAll<HTMLButtonElement>("[data-thumb]")];
+    const strip = root.querySelector<HTMLElement>(".thumbs")!;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let index = 0;
+    let timer: number | undefined;
+
+    const show = (i: number) => {
+      index = (i + thumbs.length) % thumbs.length;
+      const t = thumbs[index];
+      main.src = t.dataset.src!;
+      main.alt = t.dataset.alt!;
+      caption.textContent = t.dataset.caption!;
+      thumbs.forEach((b, j) => b.setAttribute("aria-current", String(j === index)));
+      strip.scrollTo({ left: t.offsetLeft - strip.clientWidth / 2 + t.clientWidth / 2, behavior: reduce ? "auto" : "smooth" });
+    };
+    const restart = () => {
+      window.clearInterval(timer);
+      const ms = Number(root.dataset.autoplay);
+      if (!reduce && ms && thumbs.length > 1) timer = window.setInterval(() => show(index + 1), ms);
+    };
+
+    root.querySelector("[data-prev]")!.addEventListener("click", () => (show(index - 1), restart()));
+    root.querySelector("[data-next]")!.addEventListener("click", () => (show(index + 1), restart()));
+    thumbs.forEach((t, i) => t.addEventListener("click", () => (show(i), restart())));
+    root.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") (show(index - 1), restart());
+      if (e.key === "ArrowRight") (show(index + 1), restart());
+    });
+    let x0: number | null = null;
+    main.addEventListener("touchstart", (e) => (x0 = e.touches[0].clientX), { passive: true });
+    main.addEventListener("touchend", (e) => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) (show(index + (dx < 0 ? 1 : -1)), restart());
+      x0 = null;
+    });
+    root.addEventListener("mouseenter", () => window.clearInterval(timer));
+    root.addEventListener("mouseleave", restart);
+    restart();
+  }
+</script>
+
+<style>
+  .frame {
+    position: relative;
+    margin: 0;
+    background: #0c1113;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .frame img { width: 100%; aspect-ratio: 16 / 10; max-height: min(64vh, 36rem); object-fit: contain; }
+  figcaption {
+    padding: 0.7rem 1rem;
+    background: var(--night);
+    color: var(--night-ink);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+  }
+  .nav {
+    position: absolute;
+    top: 42%;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    border: 0;
+    background: rgb(255 255 255 / 0.88);
+    color: #111;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    padding-bottom: 3px;
+  }
+  .nav:hover { background: var(--stevens); color: #fff; }
+  .prev { left: 12px; }
+  .next { right: 12px; }
+  .thumbs { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.8rem 0.1rem; scrollbar-width: thin; }
+  .thumb {
+    flex: 0 0 7.5rem;
+    aspect-ratio: 16 / 10;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    opacity: 0.72;
+    cursor: pointer;
+    background: var(--paper-2);
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .thumb:hover { opacity: 0.9; }
+  .thumb[aria-current="true"] { opacity: 1; border-color: var(--stevens); }
+  .pets-link { margin-top: 1.5rem; }
+  .culture { margin-top: 1.6rem; }
+</style>

@@ -1,0 +1,44 @@
+---
+/** The lab culture playbook (src/data/culture.yaml): a heading, Tolkien epigraph, and text for each part. */
+import { getCollection } from "astro:content";
+import { inlineMd } from "../lib/site";
+
+interface Props {
+  /** Heading level for each part, so it nests under the page's own headings. */
+  level?: "h3" | "h4";
+}
+const { level: H = "h3" } = Astro.props;
+const N = H === "h3" ? "h4" : "h5";
+const culture = (await getCollection("culture")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<div class="culture">
+  {
+    culture.map((c) => (
+      <section id={c.id}>
+        <H>{c.data.title}</H>
+        <blockquote class="epigraph">
+          <p>"{c.data.quote.text}"</p>
+          <footer>
+            {c.data.quote.by}, <cite>{c.data.quote.source}</cite>
+          </footer>
+        </blockquote>
+        {c.data.paragraphs.map((para) => (
+          <p set:html={inlineMd(para)} />
+        ))}
+        {c.data.notes.map((n) => (
+          <>
+            <N class="note-title">{n.title}</N>
+            <p set:html={inlineMd(n.text)} />
+          </>
+        ))}
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  .culture section { scroll-margin-top: 90px; }
+  .culture section + section { margin-top: 1.6rem; }
+  .note-title { font-family: var(--font-body); font-size: 1rem; font-weight: 800; margin: 1.1rem 0 0.3rem; }
+</style>

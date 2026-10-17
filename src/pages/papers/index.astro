@@ -1,0 +1,426 @@
+---
+/**
+ * Papers: a collapsible datavisards-style filter panel (facets with count bars,
+ * search, URL state), a blocks chart of papers per year (click a year to
+ * filter), then an IDL-style list grouped by year.
+ * Everything is rendered as static HTML; the script only hides and shows entries.
+ */
+import Base from "../../layouts/Base.astro";
+import Icon from "../../components/Icon.astro";
+import PaperEntry from "../../components/PaperEntry.astro";
+import { getPapers, getPeopleByName, getThemes, vocab } from "../../lib/site";
+
+const papers = await getPapers();
+const themes = await getThemes();
+const people = await getPeopleByName();
+const themeById = new Map(themes.map((t) => [t.id, t]));
+
+const typeLabel = { journal: "Journal", conference: "Conference", workshop: "Workshop", poster: "Poster", thesis: "Thesis" } as const;
+
+type Option = { value: string; label: string; count: number; color?: string };
+const tally = (values: string[][], label: (v: string) => string, color?: (v: string) => string): Option[] => {
+  const counts = new Map<string, number>();
+  for (const vs of values) for (const v of vs) counts.set(v, (counts.get(v) ?? 0) + 1);
+  return [...counts.entries()].map(([value, count]) => ({ value, label: label(value), count, color: color?.(value) }));
+};
+
+// Authors are matched by slug, since names contain spaces.
+const authorSlug = (name: string) => name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+const facets: { key: string; title: string; options: Option[] }[] = [
+  {
+    key: "theme",
+    title: "Theme",
+    options: themes
+      .map((t) => ({
+        value: t.id,
+        label: t.data.short,
+        count: papers.filter((p) => p.data.themes.includes(t.id)).length,
+        color: `var(--${t.data.color})`,
+      }))
+      .filter((o) => o.count > 0),
+  },
+  {
+    key: "author",
+    title: "Author",
+    // Lab members first, then by number of papers.
+    options: tally(papers.map((p) => p.data.authors.map(authorSlug)), (v) => papers.flatMap((p) => p.data.authors).find((a) => authorSlug(a) === v)!)
+      .sort((a, b) => Number(people.has(b.label)) - Number(people.has(a.label)) || b.count - a.count || a.label.localeCompare(b.label)),
+  },
+  {
+    key: "method",
+    title: "Method",
+    options: tally(papers.map((p) => p.data.methods), (v) => vocab.methods[v]).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label)),
+  },
+  {
+    key: "domain",
+    title: "Domain",
+    options: tally(papers.map((p) => p.data.domains), (v) => vocab.domains[v]).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label)),
+  },
+  {
+    key: "type",
+    title: "Type",
+    options: tally(papers.map((p) => [p.data.type]), (v) => typeLabel[v as keyof typeof typeLabel]).sort((a, b) => b.count - a.count),
+  },
+];
+
+const years = [...new Set(papers.map((p) => p.data.year))].sort((a, b) => b - a);
+const byYear = years.map((year) => ({ year, items: papers.filter((p) => p.data.year === year) }));
+const maxYear = Math.max(...byYear.map((g) => g.items.length));
+
+const searchText = (p: (typeof papers)[number]) =>
+  [p.data.title, p.data.short, p.data.authors.join(" "), p.data.venueFull, p.data.award ?? "", ...p.data.domains.map((d) => vocab.domains[d]), ...p.data.methods.map((m) => vocab.methods[m]), ...p.data.themes.map((t) => themeById.get(t)!.data.short)]
+    .join(" ")
+    .toLowerCase();
+---
+
+<Base title="Papers" description="Publications from the Stevens Visualization Lab in visualization, HCI, and AI. Filter by theme, author, method, domain, type, and year." editPath="src/content/papers">
+  <div class="wrap">
+    <header class="page-head">
+      <h1>Papers</h1>
+      <p class="subtitle">Field notes from our expeditions.&nbsp;<Icon name="binoculars" /></p>
+    </header>
+
+    <div data-filter-root>
+    <details class="panel filters" data-filters aria-label="Filter papers" open>
+      <summary><span class="lead">Filter</span><span class="active-count" data-active-count></span></summary>
+      <div class="filters-body">
+      <p class="intro">
+        Filter by theme, author, method, domain, or type, or search for a title or author.
+        Lab members are <span class="member-demo">underlined</span>.
+      </p>
+      <div class="facets">
+        {
+          facets.map((f) => {
+            const max = Math.max(...f.options.map((o) => o.count));
+            return (
+              <fieldset class="facet" data-facet={f.key}>
+                <legend>{f.title}</legend>
+                <ul>
+                  {f.options.map((o, i) => (
+                    <li class:list={{ extra: i >= 5 }}>
+                      <button type="button" class="option" data-value={o.value} aria-pressed="false" style={o.color ? `--c: ${o.color}` : undefined}>
+                        <span class="label">
+                          {o.color && <span class="swatch" />}
+                          {o.label}
+                        </span>
+                        <span class="count">{o.count}</span>
+                        <span class="bar" style={`width: ${Math.max(8, (o.count / max) * 100)}%`} aria-hidden="true" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                {f.options.length > 5 && (
+                  <button type="button" class="more">
+                    More…
+                  </button>
+                )}
+              </fieldset>
+            );
+          })
+        }
+      </div>
+
+      <div class="toolbar">
+        <label class="search">
+          <span class="sr-only">Search papers</span>
+          <input type="search" placeholder="Search titles, authors, venues…" data-search autocomplete="off" />
+        </label>
+        <p class="status" aria-live="polite"><span data-count>{papers.length} of {papers.length}</span> papers shown</p>
+        <button type="button" class="clear" data-clear hidden>Clear filters</button>
+      </div>
+      </div>
+    </details>
+    {/* Runs before first paint: phones start with the filters collapsed, without the page jumping afterwards. */}
+    <script is:inline>
+      if (matchMedia("(max-width: 860px)").matches) document.querySelector("[data-filters]").open = false;
+    </script>
+    {/* Without JavaScript the filter controls can't work, so hide them and just show the list. */}
+    <noscript><style is:inline>.panel, .blocks { display: none !important; }</style></noscript>
+
+    <section class="blocks" aria-labelledby="by-year">
+      <p class="blocks-head"><span class="lead" id="by-year">Papers by year</span><span class="hint">Click a year to filter</span></p>
+      <div class="timeline" role="group" aria-label="Papers per year (click to filter by year)">
+        {
+          [...byYear].reverse().map((g) => (
+            <button type="button" class="year-col" data-year={g.year} aria-pressed="false" aria-label={`${g.year}: ${g.items.length} papers`}>
+              <span class="stack" style={`--n: ${maxYear}`}>
+                {g.items.map((p) => (
+                  <span
+                    class="cell"
+                    data-id={p.id}
+                    title={p.data.short}
+                    style={`--c: ${p.data.themes[0] ? `var(--${themeById.get(p.data.themes[0])!.data.color})` : "var(--muted)"}`}
+                  />
+                ))}
+              </span>
+              <span class="year-label mono">{g.year}</span>
+            </button>
+          ))
+        }
+      </div>
+    </section>
+
+    </div>
+
+    <p class="no-results" data-empty hidden>No papers match those filters. Try clearing one.</p>
+
+    {
+      byYear.map((g) => (
+        <section class="year-group" data-group aria-labelledby={`y${g.year}`}>
+          <h2 class="year" id={`y${g.year}`}>{g.year}</h2>
+          {g.items.map((p) => (
+            <div
+              class="item"
+              data-item
+              data-id={p.id}
+              data-year={p.data.year}
+              data-theme={p.data.themes.join(" ")}
+              data-domain={p.data.domains.join(" ")}
+              data-method={p.data.methods.join(" ")}
+              data-type={p.data.type}
+              data-author={p.data.authors.map(authorSlug).join(" ")}
+              data-text={searchText(p)}
+            >
+              <PaperEntry paper={p} people={people} />
+            </div>
+          ))}
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-filter-root]")!;
+  const items = [...document.querySelectorAll<HTMLElement>("[data-item]")];
+  const groups = [...document.querySelectorAll<HTMLElement>("[data-group]")];
+  const search = root.querySelector<HTMLInputElement>("[data-search]")!;
+  const countEl = root.querySelector<HTMLElement>("[data-count]")!;
+  const clear = root.querySelector<HTMLButtonElement>("[data-clear]")!;
+  const empty = document.querySelector<HTMLElement>("[data-empty]")!;
+  const activeCount = root.querySelector<HTMLElement>("[data-active-count]")!;
+  const keys = ["theme", "author", "method", "domain", "type", "year"] as const;
+  type Key = (typeof keys)[number];
+  const state: Record<Key, Set<string>> = Object.fromEntries(keys.map((k) => [k, new Set<string>()])) as never;
+  let query = "";
+
+  // Restore state from the URL (?theme=…&domain=a,b&q=…), so filtered views can be shared.
+  const params = new URLSearchParams(location.search);
+  for (const k of keys) for (const v of (params.get(k) ?? "").split(",").filter(Boolean)) state[k].add(v);
+  query = params.get("q") ?? "";
+  search.value = query;
+
+  const matches = (el: HTMLElement) =>
+    keys.every((k) => {
+      const selected = state[k];
+      if (!selected.size) return true;
+      const values = (el.dataset[k] ?? "").split(" ");
+      return values.some((v) => selected.has(v)); // OR within a facet, AND across facets
+    }) && (!query || (el.dataset.text ?? "").includes(query.toLowerCase()));
+
+  function render() {
+    let shown = 0;
+    const visible = new Set<string>();
+    for (const el of items) {
+      const ok = matches(el);
+      el.hidden = !ok;
+      if (ok) (shown++, visible.add(el.dataset.id!));
+    }
+    for (const g of groups) g.hidden = !g.querySelector("[data-item]:not([hidden])");
+    countEl.textContent = `${shown} of ${items.length}`;
+    empty.hidden = shown > 0;
+    const n = keys.reduce((sum, k) => sum + state[k].size, 0) + (query ? 1 : 0);
+    clear.hidden = n === 0;
+    activeCount.textContent = n ? `${n} active · ${shown} of ${items.length} papers` : "";
+
+    for (const btn of root.querySelectorAll<HTMLButtonElement>(".facet .option")) {
+      const key = btn.closest<HTMLElement>(".facet")!.dataset.facet as Key;
+      btn.setAttribute("aria-pressed", String(state[key].has(btn.dataset.value!)));
+    }
+    for (const col of root.querySelectorAll<HTMLButtonElement>(".year-col")) {
+      col.setAttribute("aria-pressed", String(state.year.has(col.dataset.year!)));
+      for (const cell of col.querySelectorAll<HTMLElement>(".cell")) cell.classList.toggle("off", !visible.has(cell.dataset.id!));
+    }
+
+    const next = new URLSearchParams();
+    for (const k of keys) if (state[k].size) next.set(k, [...state[k]].join(","));
+    if (query) next.set("q", query);
+    const qs = next.toString();
+    history.replaceState(null, "", qs ? `?${qs}` : location.pathname);
+  }
+
+  const toggle = (key: Key, value: string) => {
+    state[key].has(value) ? state[key].delete(value) : state[key].add(value);
+    render();
+  };
+
+  root.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    const option = target.closest<HTMLButtonElement>(".facet .option");
+    if (option) return toggle(option.closest<HTMLElement>(".facet")!.dataset.facet as Key, option.dataset.value!);
+    const col = target.closest<HTMLButtonElement>(".year-col");
+    if (col) return toggle("year", col.dataset.year!);
+    const more = target.closest<HTMLButtonElement>(".more");
+    if (more) {
+      const facet = more.closest<HTMLElement>(".facet")!;
+      const open = facet.classList.toggle("expanded");
+      more.textContent = open ? "Less" : "More…";
+    }
+  });
+  search.addEventListener("input", () => {
+    query = search.value.trim();
+    render();
+  });
+  clear.addEventListener("click", () => {
+    for (const k of keys) state[k].clear();
+    query = "";
+    search.value = "";
+    render();
+  });
+  render();
+</script>
+
+<style>
+  .member-demo { text-decoration: underline 2px var(--stevens); text-underline-offset: 3px; font-weight: 700; color: var(--ink); }
+
+  /* The filter panel is open on wide screens and collapsed on phones (see the inline script above). */
+  .blocks { margin: 0 0 0.6rem; }
+  .blocks-head { display: flex; align-items: baseline; gap: 0.8rem; margin: 0 0 0.5rem; }
+  .blocks-head .lead { color: var(--ink); }
+  .panel {
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    background: var(--card);
+    padding: 0.9rem 1.3rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+  }
+  .panel summary {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    cursor: pointer;
+    list-style: none;
+  }
+  .panel summary::-webkit-details-marker { display: none; }
+  .panel summary::after {
+    content: "";
+    margin-left: auto;
+    align-self: center;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    rotate: 45deg;
+    translate: 0 -0.15rem;
+    transition: rotate 0.2s;
+  }
+  .panel[open] summary::after { rotate: 225deg; translate: 0 0.1rem; }
+  .panel summary .lead { color: var(--ink); }
+  .hint, .active-count { font-size: 0.8rem; color: var(--muted); }
+  .filters[open] summary { margin-bottom: 0.7rem; }
+  .filters { margin-bottom: 1.4rem; }
+  .filters-body { padding-top: 0.2rem; }
+  .intro { margin: 0 0 1rem; font-size: 0.92rem; color: var(--ink-2); }
+
+  /* Blocks chart: one column per year, a square per paper in its theme color. */
+  .timeline {
+    display: flex;
+    gap: 0.4rem;
+    align-items: flex-end;
+    overflow-x: auto;
+  }
+  .year-col {
+    flex: 1 0 3.2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    background: none;
+    border: 0;
+    border-radius: 8px;
+    padding: 0.3rem 0.2rem;
+    cursor: pointer;
+    color: var(--ink-2);
+  }
+  .year-col:hover { background: var(--paper-2); }
+  .year-col[aria-pressed="true"] { background: color-mix(in srgb, var(--stevens) 12%, transparent); }
+  .year-col[aria-pressed="true"] .year-label { color: var(--stevens); font-weight: 700; }
+  .stack { display: flex; flex-direction: column-reverse; gap: 3px; min-height: calc(var(--n) * 17px); justify-content: flex-start; }
+  .cell { width: 14px; height: 14px; border-radius: 3px; background: var(--c); transition: opacity 0.2s; }
+  .cell.off { opacity: 0.18; }
+  .year-label { font-size: 0.74rem; }
+
+  .facets { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.2rem; }
+  .facet { border: 0; margin: 0; padding: 0; min-width: 0; }
+  legend { font-size: 0.72rem; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); padding: 0; margin-bottom: 0.4rem; }
+  .facet ul { list-style: none; margin: 0; padding: 0; }
+  .facet li.extra { display: none; }
+  .facet:global(.expanded) li.extra { display: block; }
+  .option {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    width: 100%;
+    background: none;
+    border: 0;
+    padding: 0.32rem 0 0.38rem;
+    font: inherit;
+    font-size: 0.86rem;
+    text-align: left;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .option:hover .label { color: var(--stevens); }
+  .label { display: inline-flex; align-items: center; gap: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .swatch { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
+  .count { color: var(--muted); font-family: var(--font-mono); font-size: 0.76rem; }
+  .bar { position: absolute; left: 0; bottom: 0; height: 2px; background: color-mix(in srgb, var(--c, var(--lake)) 30%, var(--rule)); border-radius: 2px; }
+  .option[aria-pressed="true"] .label { color: var(--ink); font-weight: 900; }
+  .option[aria-pressed="true"] .bar { height: 3px; background: var(--c, var(--stevens)); }
+  .more { margin-top: 0.2rem; background: none; border: 0; padding: 0; font: inherit; font-size: 0.8rem; font-weight: 800; color: var(--stevens); cursor: pointer; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--rule-strong); }
+  .search { flex: 1 1 18rem; }
+  .search input {
+    width: 100%;
+    font: inherit;
+    font-size: 0.95rem;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: 8px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .search input:focus { outline: 2px solid var(--stevens); outline-offset: 1px; }
+  .status { margin: 0; font-size: 0.88rem; color: var(--muted); }
+  .status span { font-family: var(--font-mono); color: var(--ink); }
+  .clear { font: inherit; font-size: 0.85rem; font-weight: 800; background: none; border: 1px solid var(--rule-strong); border-radius: 7px; padding: 0.35rem 0.75rem; cursor: pointer; color: var(--ink); }
+  .clear:hover { border-color: var(--stevens); color: var(--stevens); }
+
+  .no-results { padding: 2rem 0; color: var(--muted); text-align: center; }
+
+  .year {
+    position: sticky;
+    top: var(--nav-h);
+    z-index: 2;
+    margin: 1.6rem 0 0;
+    padding: 0.5rem 0;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    background: color-mix(in srgb, var(--paper) 90%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px dashed var(--rule-strong);
+  }
+  .item + .item { border-top: 1px solid var(--rule); }
+  [hidden] { display: none !important; }
+
+  @media (max-width: 1060px) { .facets { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 760px) { .facets { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .facets { grid-template-columns: 1fr; gap: 0.8rem; } }
+</style>

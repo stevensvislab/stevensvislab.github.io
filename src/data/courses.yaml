@@ -1,0 +1,33 @@
+# Courses taught by lab faculty (Courses section on the home page).
+#
+# Example:
+# - code: CS 538
+#   title: Data Visualization
+#   type: lecture                              # lecture | seminar | lab
+#   level: [graduate, senior undergraduate]    # any of: graduate, senior undergraduate, undergraduate, special topics
+#   terms: [Spring 2027, Spring 2028]          # one or more
+#   url: https://...                           # optional: course website
+#   description: >-                            # optional; a blank line starts a new paragraph
+#     What the course covers.
+
+- code: CS 538
+  title: Data Visualization
+  type: lecture
+  level: [graduate, senior undergraduate]
+  terms: [Spring 2027]
+  description: >-
+    Data increasingly shapes decisions all around us, from tracking disease outbreaks and
+    forecasting elections, to mapping connections in criminal investigations, monitoring
+    network security threats, and helping consumers choose what to buy. Data visualization
+    is a multi-disciplinary area of research that helps people analyze and understand data
+    at scale. Drawing on human-computer interaction, data science, psychology, and machine
+    learning, data visualizations turn complex calculations into visual patterns we can
+    quickly interpret, improving human comprehension, memory, and decision-making.
+
+    This course introduces the theoretical foundations and practical techniques for
+    transforming data into visualizations that support analysis, communication, and
+    decision-making. Students will study graphical perception, visual encoding, and
+    interaction design, while exploring applications across domains such as social
+    networks, geospatial data, business intelligence, and scientific data. Through hands-on
+    assignments and a final project, students will design, build, and critically evaluate
+    interactive visualization systems.

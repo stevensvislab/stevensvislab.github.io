@@ -1,0 +1,135 @@
+# Paper tags, all in one place. Each tag lists the papers it applies to, so papers don't repeat their tags.
+# The filters, pills, and About-page collaborators on the site are all built from this file.
+#
+# Groups:
+#   domains   application areas (outlined #pills)
+#   methods   methods and techniques (plain pills)
+#   partners  collaborating organizations (logo + name on paper pages; cards on About). Logos go in public/logos/.
+#
+# Example: add a new tag, or add a paper slug to an existing tag's list.
+#   domains:
+#     healthcare:                        # key: lowercase-with-hyphens; shows up in filter URLs
+#       label: Healthcare                # display name
+#       papers: [ongoal, my-new-paper]   # paper slugs (file names in src/content/papers/)
+#   partners:
+#     nyu:
+#       label: New York University
+#       logo: nyu-logo.svg               # optional, file in public/logos/
+#       papers: [my-new-paper]
+
+# Application domains
+domains:
+  education:
+    label: Education
+    papers: [draftmarks, iscore, prompt-eval, vista]
+  intelligence:
+    label: Intelligence analysis
+    papers: [agentk-vast, vispile]
+  decisions:
+    label: Decision-making
+    papers: [lrg, lumos]
+  data-science:
+    label: Data science
+    papers: [guidelines]
+  interactive-ml:
+    label: Interactive ML
+    papers: [biasfuture, iscore, knowledgevis]
+  writing:
+    label: Reading & writing
+    papers: [draftmarks, ongoal]
+  ocean-science:
+    label: Ocean science
+    papers: [deepsee]
+  design:
+    label: Graphic design
+    papers: [less-is-more]
+
+# Methods and techniques
+methods:
+  text-vis:
+    label: Text visualization
+    papers: [agentk-vast, vispile]
+  knowledge-graphs:
+    label: Knowledge graphs
+    papers: [agentk-vast, vispile]
+  multidim-vis:
+    label: Multidimensional vis
+    papers: [deepsee]
+  geospatial:
+    label: Geospatial & 3D
+    papers: [deepsee]
+  provenance:
+    label: Provenance & traces
+    papers: [agentk-vast, draftmarks, guidelines, lrg, lumos, ongoal, vista]
+  interpretability:
+    label: Interpretability
+    papers: [iscore, knowledgevis]
+  llm:
+    label: Large language models
+    papers: [agentk-vast, draftmarks, iscore, knowledgevis, ongoal, prompt-eval, vispile]
+  generative-ai:
+    label: Generative AI
+    papers: [less-is-more]
+  co-design:
+    label: Co-design
+    papers: [deepsee, iscore, vispile, vista]
+  field-deployment:
+    label: Field deployment
+    papers: [deepsee, iscore]
+  expert-study:
+    label: Expert study
+    papers: [knowledgevis, vispile, vista]
+  user-study:
+    label: Controlled study
+    papers: [draftmarks, guidelines, less-is-more, lrg, lumos, ongoal]
+  evaluation:
+    label: Evaluation methods
+    papers: [prompt-eval]
+  research-agenda:
+    label: Research agenda
+    papers: [biasfuture]
+
+# Partner organizations
+partners:
+  gt:
+    label: Georgia Tech
+    logo: gt-logo.png
+    papers: [agentk-vast, biasfuture, deepsee, guidelines, iscore, knowledgevis, lrg, lumos, ongoal, vispile, vista]
+  las:
+    label: Laboratory for Analytic Sciences
+    logo: las-logo.png
+    papers: [vispile]
+  adobe:
+    label: Adobe Research
+    logo: Visit-Adobe-badge.png
+    papers: [ongoal]
+  caltech:
+    label: Caltech
+    logo: caltech-seal.svg
+    papers: [deepsee]
+  artcenter:
+    label: ArtCenter College of Design
+    logo: artcenter-logo.png
+    papers: [deepsee]
+  jpl:
+    label: NASA Jet Propulsion Laboratory
+    logo: nasa-logo.png
+    papers: [deepsee]
+  mbari:
+    label: Monterey Bay Aquarium Research Institute
+    logo: mbari-logo.svg
+    papers: [deepsee]
+  vanderbilt:
+    label: Vanderbilt University
+    logo: vanderbilt-logo.svg
+    papers: [iscore, prompt-eval]
+  tufts:
+    label: Tufts University
+    logo: tufts-logo.png
+    papers: [guidelines]
+  stanford:
+    label: Stanford University
+    papers: [draftmarks]
+  brown:
+    label: Brown University
+    papers: [less-is-more]

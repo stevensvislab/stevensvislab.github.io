@@ -1,0 +1,47 @@
+---
+/** A tight one-line paper item (VIS Design Lab style) with a small teaser on the left. */
+import type { Paper } from "../lib/site";
+import Teaser from "./Teaser.astro";
+
+interface Props {
+  paper: Paper;
+}
+const { paper } = Astro.props;
+---
+
+<a class="compact" href={`/papers/${paper.id}/`}>
+  <span class="thumb"><Teaser paper={paper} width={140} /></span>
+  <span class="text">
+    <span class="name">{paper.data.title}</span>
+    <span class="venue mono">{paper.data.venue}{paper.data.award && <span class="star" title={paper.data.award}> · ★ award</span>}</span>
+  </span>
+</a>
+
+<style>
+  .compact {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 0.8rem;
+    align-items: start;
+    padding: 0.5rem 0;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .thumb {
+    display: block;
+    width: 140px;
+    aspect-ratio: 140 / 84;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+  }
+  .text { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+  .name {
+    font-weight: 700;
+    font-size: 0.93rem;
+    line-height: 1.32;
+  }
+  .compact:hover .name { color: var(--stevens); text-decoration: underline; }
+  .venue { color: var(--muted); font-size: 0.74rem; }
+  .star { color: color-mix(in srgb, var(--ochre) 85%, var(--ink)); }
+</style>

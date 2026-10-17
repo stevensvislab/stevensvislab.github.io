@@ -1,0 +1,241 @@
+---
+/**
+ * Spotlight carousel (IDL layout + arrows on both sides).
+ * Built on a native scroll-snap track, so it swipes and scrolls without JS.
+ * The script adds ‹ › arrows, trail-dot indicators, keyboard control, and a
+ * gentle autoplay that pauses on hover/focus and is off for reduced motion.
+ * With JS, the title tag stays fixed in the corner while the images slide
+ * beneath it; without JS, each slide keeps its own tag.
+ */
+import type { Paper } from "../lib/site";
+import Teaser from "./Teaser.astro";
+
+interface Props {
+  papers: Paper[];
+  interval?: number;
+}
+const { papers, interval = 7000 } = Astro.props;
+---
+
+<section class="carousel" aria-roledescription="carousel" aria-label="Featured research" data-interval={interval}>
+  <div class="frame">
+  <div class="track" tabindex="0">
+    {
+      papers.map((paper, i) => (
+        <article
+          class="slide"
+          aria-roledescription="slide"
+          aria-label={`${i + 1} of ${papers.length}: ${paper.data.short}`}
+          id={`slide-${paper.id}`}
+          data-short={paper.data.short}
+          data-venue={paper.data.venue}
+          data-href={`/papers/${paper.id}/`}
+        >
+          <a href={`/papers/${paper.id}/`} class="slide-link">
+            <Teaser paper={paper} width={1100} loading={i === 0 ? "eager" : "lazy"} priority={i === 0} />
+            <span class="tag">
+              <b>{paper.data.short}</b>
+              <span class="tag-sub">{paper.data.venue}</span>
+            </span>
+          </a>
+        </article>
+      ))
+    }
+  </div>
+  {
+    papers[0] && (
+      <a class="tag fixed-tag" href={`/papers/${papers[0].id}/`} hidden aria-hidden="true" tabindex="-1">
+        <b data-tag-title>{papers[0].data.short}</b>
+        <span class="tag-sub" data-tag-venue>{papers[0].data.venue}</span>
+      </a>
+    )
+  }
+  </div>
+  <button class="arrow prev" type="button" aria-label="Previous slide" hidden>‹</button>
+  <button class="arrow next" type="button" aria-label="Next slide" hidden>›</button>
+  <div class="dots" hidden>
+    {papers.map((p, i) => <button type="button" aria-label={`Show ${p.data.short}`} data-index={i} />)}
+  </div>
+</section>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>(".carousel")) {
+    const track = root.querySelector<HTMLElement>(".track")!;
+    const slides = [...track.querySelectorAll<HTMLElement>(".slide")];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>(".dots button")];
+    const prev = root.querySelector<HTMLButtonElement>(".prev")!;
+    const next = root.querySelector<HTMLButtonElement>(".next")!;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let index = 0;
+    let timer: number | undefined;
+
+    const fixedTag = root.querySelector<HTMLAnchorElement>(".fixed-tag");
+    for (const el of [prev, next, root.querySelector<HTMLElement>(".dots")!, fixedTag]) if (el) el.hidden = false;
+    root.classList.add("enhanced");
+
+    const go = (i: number) => {
+      index = (i + slides.length) % slides.length;
+      track.scrollTo({ left: slides[index].offsetLeft - track.offsetLeft, behavior: reduce ? "auto" : "smooth" });
+    };
+    const mark = () => {
+      dots.forEach((d, i) => d.setAttribute("aria-current", String(i === index)));
+      const s = slides[index].dataset;
+      if (fixedTag) {
+        fixedTag.href = s.href!;
+        fixedTag.querySelector("[data-tag-title]")!.textContent = s.short!;
+        fixedTag.querySelector("[data-tag-venue]")!.textContent = s.venue!;
+      }
+    };
+
+    // Keep the index in sync with manual swipes/scrolls.
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries)
+          if (e.isIntersecting && e.intersectionRatio > 0.6) {
+            index = slides.indexOf(e.target as HTMLElement);
+            mark();
+          }
+      },
+      { root: track, threshold: [0.6] },
+    );
+    slides.forEach((s) => io.observe(s));
+
+    prev.addEventListener("click", () => go(index - 1));
+    next.addEventListener("click", () => go(index + 1));
+    dots.forEach((d, i) => d.addEventListener("click", () => go(i)));
+    track.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") (e.preventDefault(), go(index - 1));
+      if (e.key === "ArrowRight") (e.preventDefault(), go(index + 1));
+    });
+
+    const interval = Number(root.dataset.interval) || 7000;
+    const start = () => {
+      if (reduce || slides.length < 2) return;
+      stop();
+      timer = window.setInterval(() => go(index + 1), interval);
+    };
+    const stop = () => window.clearInterval(timer);
+    root.addEventListener("mouseenter", stop);
+    root.addEventListener("mouseleave", start);
+    root.addEventListener("focusin", stop);
+    root.addEventListener("focusout", start);
+    document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+    mark();
+    start();
+  }
+</script>
+
+<style>
+  .carousel { position: relative; }
+  .frame { position: relative; }
+  .track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    border-radius: 14px;
+    border: 1px solid var(--rule);
+    background: var(--card);
+    box-shadow: var(--shadow);
+  }
+  .track::-webkit-scrollbar { display: none; }
+  .slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    aspect-ratio: 16 / 5.2;
+    position: relative;
+  }
+  .slide-link { display: block; position: absolute; inset: 0; text-decoration: none; color: var(--ink); }
+  .slide :global(img),
+  .slide :global(.teaser) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+  }
+  /* IDL's title tag pinned bottom-right with clipped corners. */
+  .tag {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    background: var(--card);
+    border: 1px solid var(--rule-strong);
+    border-radius: 0 10px 0 10px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.95rem;
+    box-shadow: var(--shadow);
+  }
+  .tag b { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
+  .tag-sub { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+  .slide-link:hover .tag b,
+  .fixed-tag:hover b { color: var(--stevens); }
+  .fixed-tag { text-decoration: none; color: var(--ink); z-index: 1; }
+  .fixed-tag[hidden] { display: none; }
+  .carousel:global(.enhanced) .slide .tag { display: none; }
+
+  .arrow {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--rule-strong);
+    background: color-mix(in srgb, var(--card) 92%, transparent);
+    color: var(--ink);
+    font-size: 1.7rem;
+    line-height: 1;
+    padding-bottom: 4px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    display: grid;
+    place-items: center;
+  }
+  .arrow[hidden] { display: none; }
+  .arrow:hover { background: var(--stevens); color: var(--on-stevens); border-color: var(--stevens); }
+  .prev { left: -22px; }
+  .next { right: -22px; }
+
+  /* Trail-dot indicators: a dashed line with waypoints. */
+  .dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin-top: 0.9rem;
+    position: relative;
+  }
+  .dots[hidden] { display: none; }
+  .dots button {
+    width: 10px;
+    height: 10px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid var(--rule-strong);
+    background: var(--paper);
+    cursor: pointer;
+    position: relative;
+  }
+  .dots button:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    top: 2px;
+    width: 12px;
+    border-top: 2px dotted var(--rule-strong);
+  }
+  .dots button[aria-current="true"] { background: var(--stevens); border-color: var(--stevens); transform: scale(1.25); }
+
+  @media (max-width: 1180px) {
+    .prev { left: 10px; }
+    .next { right: 10px; }
+  }
+  @media (max-width: 640px) {
+    .slide { aspect-ratio: 16 / 10; }
+    .arrow { width: 38px; height: 38px; font-size: 1.4rem; }
+    .tag { right: 8px; bottom: 8px; font-size: 0.85rem; }
+  }
+</style>

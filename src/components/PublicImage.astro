@@ -1,0 +1,40 @@
+---
+/**
+ * An image from public/. In production builds, scripts/optimize-images.mjs writes
+ * smaller WebP copies next to each image (`name-480.webp`, `name-960.webp`, and
+ * `name.webp` up to 1600px wide), and this offers them to the browser with the original as a
+ * fallback. In `npm run dev` the original is used directly.
+ */
+import { imageSize } from "../lib/images";
+
+interface Props {
+  src: string;
+  alt: string;
+  /** CSS width the image is shown at, used to pick the right copy. */
+  sizes?: string;
+  class?: string;
+  loading?: "lazy" | "eager";
+  /** Tell the browser to fetch this image first (the main image at the top of a page). */
+  priority?: boolean;
+}
+const { src, alt, sizes = "100vw", class: className, loading = "lazy", priority = false } = Astro.props;
+const base = src.replace(/\.[^./]+$/, "");
+const optimize = import.meta.env.PROD && /\.(png|jpe?g)$/i.test(src);
+// Width and height let the browser reserve the image's space before it loads (no layout shift).
+const size = await imageSize(src);
+---
+
+{
+  optimize ? (
+    <picture>
+      <source type="image/webp" srcset={`${base}-480.webp 480w, ${base}-960.webp 960w, ${base}.webp 1600w`} sizes={sizes} />
+      <img src={src} alt={alt} class={className} loading={loading} decoding="async" fetchpriority={priority ? "high" : undefined} width={size?.width} height={size?.height} />
+    </picture>
+  ) : (
+    <img src={src} alt={alt} class={className} loading={loading} decoding="async" width={size?.width} height={size?.height} />
+  )
+}
+
+<style>
+  picture { display: contents; }
+</style>

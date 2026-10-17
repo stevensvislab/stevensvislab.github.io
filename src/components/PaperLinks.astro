@@ -1,0 +1,160 @@
+---
+/**
+ * Materials row for a paper (Paper · Demo · Video · …), with the same Font
+ * Awesome icons as adamcoscia.com, plus an optional BibTeX "Cite" toggle that
+ * stays in the row and opens the citation underneath.
+ */
+import type { Paper } from "../lib/site";
+import Icon, { type FaName } from "./Icon.astro";
+
+interface Props {
+  paper: Paper;
+  /** Show the link to the paper's own page first. */
+  showPage?: boolean;
+  buttons?: boolean;
+  /** Include the Cite menu (the paper page shows the citation as its own section instead). */
+  cite?: boolean;
+  /** Distinguishes element ids when one paper is listed twice on a page. */
+  idSuffix?: string;
+}
+const { paper, showPage = false, buttons = false, cite = true, idSuffix = "" } = Astro.props;
+const l = paper.data.links;
+// Brand colors match the personal site; neutral icons follow the text color so they work in dark mode.
+type Item = { label: string; href?: string; icon: FaName; color?: string };
+const details: Item[] = showPage ? [{ label: "Details", href: `/papers/${paper.id}/`, icon: "home" }] : [];
+const all: Item[] = [
+  ...details,
+  { label: "PDF", href: l.pdf, icon: "filePdf", color: "#ed2224" },
+  { label: "DOI", href: l.doi, icon: "link" },
+  { label: "Project", href: l.project, icon: "home" },
+  { label: "Demo", href: l.demo, icon: "rocket" },
+  { label: "Video", href: l.video, icon: "youtube", color: "#ff0000" },
+  { label: "Talk", href: l.talk, icon: "youtube", color: "#ff0000" },
+  { label: "Slides", href: l.slides, icon: "filePowerpoint", color: "#d04423" },
+  { label: "Poster", href: l.poster, icon: "chalkboardTeacher" },
+  { label: "Code", href: l.code, icon: "github" },
+  { label: "Data", href: l.data, icon: "database" },
+];
+const items = all.filter((i) => i.href);
+const external = (href: string) => /^https?:/.test(href);
+const citeId = `cite-${paper.id}${idSuffix}`;
+---
+
+<div class:list={["paper-links", { buttons }]}>
+  {
+    items.map((i) => (
+      <a href={i.href} {...(external(i.href!) ? { rel: "noopener" } : {})}>
+        <Icon fa={i.icon} color={i.color} />
+        {i.label}
+      </a>
+    ))
+  }
+  {
+    cite && paper.data.bibtex && (
+      <>
+        {/* The toggle stays inline with the links; the panel is a separate row underneath. */}
+        <button type="button" class="cite-toggle" aria-expanded="false" aria-controls={`${citeId}-panel`}>
+          <Icon fa="quoteLeft" />
+          Cite
+          <Icon fa="chevronDown" class="chevron" />
+        </button>
+        <div class="cite-panel" id={`${citeId}-panel`} hidden>
+          <pre id={citeId}>{paper.data.bibtex.trim()}</pre>
+          <button type="button" class="copy" data-copy={citeId}>
+            Copy BibTeX
+          </button>
+        </div>
+      </>
+    )
+  }
+</div>
+
+<script>
+  document.addEventListener("click", async (e) => {
+    const toggle = (e.target as HTMLElement).closest<HTMLButtonElement>("button.cite-toggle");
+    if (toggle) {
+      const panel = document.getElementById(toggle.getAttribute("aria-controls")!)!;
+      const open = toggle.getAttribute("aria-expanded") !== "true";
+      toggle.setAttribute("aria-expanded", String(open));
+      panel.hidden = !open;
+      return;
+    }
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-copy]");
+    if (!btn) return;
+    const text = document.getElementById(btn.dataset.copy!)?.textContent ?? "";
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = "Copied!";
+    } catch {
+      btn.textContent = "Select the text to copy";
+    }
+    setTimeout(() => (btn.textContent = "Copy BibTeX"), 1800);
+  });
+</script>
+
+<style>
+  .paper-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem 1rem;
+    font-size: 0.86rem;
+    font-weight: 700;
+  }
+  .paper-links > a,
+  .cite-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--ink-2);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .paper-links :global(.icon) { font-size: 1.1em; }
+  .cite-toggle { font: inherit; background: none; border: 0; padding: 0; }
+  .paper-links > a:hover,
+  .cite-toggle:hover { color: var(--stevens); }
+  .buttons { gap: 0.5rem; }
+  .buttons > a,
+  .buttons .cite-toggle {
+    border: 1px solid var(--rule-strong);
+    border-radius: 7px;
+    padding: 0.4rem 0.8rem;
+    background: var(--card);
+  }
+  .buttons :global(.icon) { font-size: 1.25em; }
+  .buttons > a:hover,
+  .buttons .cite-toggle:hover { border-color: var(--stevens); }
+  .cite-toggle :global(.chevron) { font-size: 0.8em; transition: rotate 0.2s; }
+  .cite-toggle[aria-expanded="true"] { color: var(--stevens); }
+  .cite-toggle[aria-expanded="true"] :global(.chevron) { rotate: 180deg; }
+  .cite-panel {
+    flex-basis: 100%;
+    margin-top: 0.2rem;
+    border-left: 3px solid var(--stevens);
+    background: var(--paper-2);
+    border-radius: 0 8px 8px 0;
+    padding: 0.7rem 0.9rem;
+  }
+  pre {
+    margin: 0 0 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 400;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--ink-2);
+  }
+  .copy {
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    border: 1px solid var(--rule-strong);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 6px;
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+  }
+</style>

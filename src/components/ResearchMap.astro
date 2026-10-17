@@ -1,0 +1,170 @@
+---
+/**
+ * The Research Map: themes as regions of terrain, papers as landmarks placed
+ * by year, dashed trails where one project builds on another. Static SVG; every
+ * landmark is a link with an accessible name, and hover/focus reveals its label.
+ */
+import { layoutMap } from "../graphics/researchMap";
+import type { Paper, Theme } from "../lib/site";
+
+interface Props {
+  themes: Theme[];
+  papers: Paper[];
+  /** Highlight one theme (used on theme pages). */
+  focus?: string;
+}
+const { themes, papers, focus } = Astro.props;
+const map = layoutMap(themes, papers);
+const shown = new Set(themes.map((t) => t.id));
+---
+
+<figure class="research-map">
+  <div class="scroller">
+    <svg
+      viewBox={`0 0 ${map.width} ${map.height}`}
+      role="group"
+      aria-labelledby="map-title map-desc"
+      class:list={{ focused: Boolean(focus) }}
+    >
+      <title id="map-title">Research map</title>
+      <desc id="map-desc">
+        Each band is a research theme and each marker a paper, placed by year. Dashed trails connect projects that build on one another.
+      </desc>
+      <defs>
+        {
+          map.regions.map((r) => (
+            <pattern id={`hatch-${r.theme.id}`} width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+              <line x1="0" y1="0" x2="0" y2="7" style={`stroke: var(--${r.theme.data.color})`} stroke-width="1" opacity="0.22" />
+            </pattern>
+          ))
+        }
+      </defs>
+
+      <g class="meridians" aria-hidden="true">
+        {
+          map.ticks.map((t) => (
+            <>
+              <line x1={t.x} x2={t.x} y1={map.top - 14} y2={map.height - 18} />
+              <text x={t.x} y={map.top - 24} text-anchor="middle">{t.year}</text>
+            </>
+          ))
+        }
+      </g>
+
+      {
+        map.regions.map((r) => (
+          <g class:list={["region", { dim: focus && focus !== r.theme.id }]} style={`--c: var(--${r.theme.data.color})`}>
+            <path d={r.d} class="region-fill" />
+            <path d={r.d} class="region-hatch" fill={`url(#hatch-${r.theme.id})`} />
+            <path d={r.d} class="region-edge" />
+            <a href={`/papers/?theme=${r.theme.id}`} class="region-label">
+              <text x={r.labelX} y={r.y}>{r.theme.data.short.toUpperCase()}</text>
+            </a>
+          </g>
+        ))
+      }
+
+      <g class="trails" aria-hidden="true">
+        {map.trails.map((d) => <path d={d} />)}
+      </g>
+
+      {
+        map.landmarks
+          .filter((l) => l.paper.data.themes.some((t) => shown.has(t)))
+          .map((l) => (
+            <a
+              href={`/papers/${l.paper.id}/`}
+              class:list={["landmark", { dim: focus && !l.paper.data.themes.includes(focus) }]}
+              style={`--c: ${l.color}`}
+              aria-label={`${l.paper.data.short}, ${l.paper.data.venue}`}
+            >
+              <g transform={`translate(${l.x} ${l.y})`}>
+                <circle r="13" class="halo" />
+                {l.award ? (
+                  <path d="M-1 -9 V8 M-1 -9 L9 -5.5 L-1 -2" class="flag" />
+                ) : (
+                  <path d="M0 -8 L7 6 L-7 6 Z" class="peak" />
+                )}
+                <text y={l.labelBelow ? 26 : -16} text-anchor="middle" class="label">
+                  {l.paper.data.short}
+                </text>
+              </g>
+            </a>
+          ))
+      }
+
+      <g class="compass" transform={`translate(${map.width - 44} ${map.height - 46})`} aria-hidden="true">
+        <circle r="18" />
+        <path d="M0 -15 L4 0 L0 15 L-4 0 Z" />
+        <path d="M0 -15 L4 0 L-4 0 Z" class="north" />
+        <text y="-21" text-anchor="middle">N</text>
+      </g>
+    </svg>
+  </div>
+  <figcaption>
+    <span class="key"><svg width="14" height="14" viewBox="-8 -9 16 16" aria-hidden="true"><path d="M0 -8 L7 6 L-7 6 Z" /></svg> paper</span>
+    <span class="key"><svg width="14" height="14" viewBox="-6 -10 16 20" aria-hidden="true"><path d="M-1 -9 V8 M-1 -9 L9 -5.5 L-1 -2" class="flag" /></svg> award</span>
+    <span class="key"><svg width="26" height="8" aria-hidden="true"><path d="M1 4 H25" class="trail-key" /></svg> builds on</span>
+    <span class="hint">Click a landmark to visit the paper; click a region for the theme.</span>
+  </figcaption>
+</figure>
+
+<style>
+  .research-map { margin: 0; }
+  .scroller { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .scroller > svg { width: 100%; min-width: 720px; height: auto; font-family: var(--font-body); }
+  .key svg { display: inline-block; width: auto; height: 14px; }
+  .meridians line { stroke: var(--rule); stroke-dasharray: 2 6; }
+  .meridians text { font-family: var(--font-mono); font-size: 12px; fill: var(--muted); letter-spacing: 0.05em; }
+  .region-fill { fill: color-mix(in srgb, var(--c) 8%, var(--paper)); }
+  .region-edge { fill: none; stroke: color-mix(in srgb, var(--c) 55%, transparent); stroke-width: 1.5; stroke-dasharray: 1 0; }
+  .region-label text {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    fill: color-mix(in srgb, var(--c) 85%, var(--ink));
+  }
+  .region-label:hover text, .region-label:focus-visible text { text-decoration: underline; }
+  .region.dim, .landmark.dim { opacity: 0.3; }
+  .trails path {
+    fill: none;
+    stroke: var(--stevens);
+    stroke-width: 2;
+    stroke-dasharray: 2 6;
+    stroke-linecap: round;
+  }
+  .landmark { cursor: pointer; }
+  .landmark .halo { fill: transparent; }
+  .landmark .peak { fill: var(--c); stroke: var(--paper); stroke-width: 1.5; stroke-linejoin: round; }
+  .flag, .key .flag { fill: var(--ochre); stroke: color-mix(in srgb, var(--ochre) 70%, var(--ink)); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .landmark .label {
+    font-size: 12.5px;
+    font-weight: 800;
+    fill: var(--ink);
+    paint-order: stroke;
+    stroke: var(--paper);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  .landmark:hover .halo, .landmark:focus-visible .halo { fill: color-mix(in srgb, var(--c) 22%, transparent); }
+  .landmark:hover .label, .landmark:focus-visible .label { fill: var(--stevens); }
+  .landmark:focus-visible { outline: none; }
+  .compass circle { fill: var(--paper); stroke: var(--rule-strong); stroke-dasharray: 2 3; }
+  .compass path { fill: var(--ink-2); }
+  .compass .north { fill: var(--stevens); }
+  .compass text { font-family: var(--font-mono); font-size: 10px; fill: var(--muted); }
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.2rem;
+    align-items: center;
+    margin-top: 0.6rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .key { display: inline-flex; align-items: center; gap: 0.35rem; }
+  .key path { fill: var(--ink-2); }
+  .trail-key { fill: none !important; stroke: var(--stevens); stroke-width: 2; stroke-dasharray: 2 5; stroke-linecap: round; }
+  .hint { margin-left: auto; }
+  @media (max-width: 760px) { .hint { margin-left: 0; } }
+</style>

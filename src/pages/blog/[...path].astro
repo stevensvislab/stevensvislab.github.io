@@ -1,0 +1,53 @@
+---
+/** A blog post: byline, long-form date, italic lede, lead image, then the body. */
+import { getCollection, getEntry, render, type CollectionEntry } from "astro:content";
+import type { GetStaticPaths } from "astro";
+import Base from "../../layouts/Base.astro";
+import PaperCompact from "../../components/PaperCompact.astro";
+import PublicImage from "../../components/PublicImage.astro";
+import { formatDay, getLinkedPaper, publicFile } from "../../lib/site";
+import { postParams } from "../../lib/blog";
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection("blog", (p) => !p.data.draft);
+  return posts.map((post) => ({ params: postParams(post), props: { post } }));
+}) satisfies GetStaticPaths;
+
+const { post } = Astro.props as { post: CollectionEntry<"blog"> };
+const { Content } = await render(post);
+const author = await getEntry("people", post.data.author);
+if (!author) throw new Error(`blog/${post.id}: author "${post.data.author}" is not in people.yaml`);
+const paper = await getLinkedPaper(post.data.paper, `blog/${post.id}.md`);
+---
+
+<Base title={post.data.title} description={post.data.lede} editPath={`src/content/blog/${post.id}.md`}>
+  <article class="wrap narrow post">
+    <h1>{post.data.title}</h1>
+    <p class="byline">
+      <a href={`/people/#${author.id}`}><b>{author.data.name}</b></a><br />
+      <time datetime={post.data.date.toISOString()}>{formatDay(post.data.date)}</time>
+    </p>
+    <p class="lede">{post.data.lede}</p>
+    {post.data.image && <PublicImage src={publicFile("blog", post.data.image, `blog/${post.id}.md`)!} alt={post.data.imageAlt ?? ""} sizes="(max-width: 760px) 100vw, 720px" class="lead-img" loading="eager" />}
+    <div class="prose"><Content /></div>
+    {
+      paper && (
+        <aside class="paper">
+          <p class="lead">The paper</p>
+          <PaperCompact paper={paper} />
+        </aside>
+      )
+    }
+  </article>
+</Base>
+
+<style>
+  .post { padding-top: 1.6rem; }
+  .byline { color: var(--ink-2); font-size: 0.95rem; }
+  .byline time { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
+  .lede { font-size: 1.2rem; font-style: italic; color: var(--ink-2); }
+  :global(.lead-img) { border-radius: 12px; border: 1px solid var(--rule); margin: 1rem 0 1.6rem; }
+  .prose :global(img) { border-radius: 10px; }
+  .prose :global(figcaption), .prose :global(img + em) { display: block; font-size: 0.88rem; color: var(--muted); margin-top: 0.4rem; }
+  .paper { margin-top: 2.4rem; padding-top: 1rem; border-top: 1px dashed var(--rule-strong); }
+</style>

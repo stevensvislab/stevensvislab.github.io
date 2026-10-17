@@ -1,0 +1,37 @@
+---
+import Base from "../layouts/Base.astro";
+import Contours from "../components/Contours.astro";
+import { LOST } from "../graphics/contourSets";
+import Icon from "../components/Icon.astro";
+---
+
+<Base title="Off the trail" description="This page could not be found." topContours={false} noindex>
+  <section class="lost">
+    <Contours {...LOST} class="lost-contours" />
+    <div class="wrap">
+      <p class="code mono">404 · uncharted territory</p>
+      <h1>Not all those who wander are lost.</h1>
+      <p class="attrib mono">J.R.R. Tolkien, <cite>The Fellowship of the Ring</cite></p>
+      <p>But this page isn't on our map. It may have moved when the lab's site was rebuilt.</p>
+      <p class="actions">
+        <a class="btn primary" href="/"><Icon name="trailhead" />Back to the trailhead</a>
+        <a class="btn" href="/papers/">Browse papers</a>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lost { position: relative; overflow: hidden; padding: 5rem 0 4rem; isolation: isolate; text-align: center; }
+  /* Faint contours that fade out behind the text, so it stays easy to read. */
+  .lost :global(.lost-contours) {
+    z-index: -1;
+    opacity: 0.45;
+    mask-image: radial-gradient(closest-side, transparent 35%, #000 70%, transparent);
+    -webkit-mask-image: radial-gradient(closest-side, transparent 35%, #000 70%, transparent);
+  }
+  .code { color: var(--stevens); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+  h1 { max-width: 34rem; margin: 0.4rem auto 0.3rem; }
+  .attrib { color: var(--muted); margin-bottom: 1.4rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; margin-top: 1.6rem; }
+</style>

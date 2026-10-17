@@ -1,0 +1,40 @@
+---
+/** Author list; lab members are underlined and linked to their People card. */
+import type { Person } from "../lib/site";
+
+interface Props {
+  authors: string[];
+  people: Map<string, Person>;
+}
+const { authors, people } = Astro.props;
+---
+
+<span class="authors">
+  {
+    authors.map((name, i) => {
+      const member = people.get(name);
+      return (
+        <>
+          {member ? (
+            <a class="member" href={`/people/#${member.id}`}>
+              {name}
+            </a>
+          ) : (
+            <span>{name}</span>
+          )}
+          {i < authors.length - 1 ? ", " : ""}
+        </>
+      );
+    })
+  }
+</span>
+
+<style>
+  .member {
+    text-decoration: underline;
+    text-decoration-color: var(--stevens);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+    font-weight: 700;
+  }
+</style>

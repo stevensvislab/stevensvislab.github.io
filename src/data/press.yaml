@@ -1,0 +1,38 @@
+# Press coverage (/press/). Sorted by date on the site.
+#
+# Example:
+# - date: 2027-03-01
+#   title: Headline of the Article
+#   outlet: Stevens News
+#   url: https://...
+#   papers: [ongoal, vispile]                  # optional: slugs of the papers it covers; each gets a mini card
+
+- date: 2026-04-01
+  title: This New Tool Makes AI's Role in Student Writing Visible
+  outlet: Georgia Tech Office of Research
+  url: https://research.gatech.edu/new-tool-makes-ais-role-student-writing-visible
+  papers: [draftmarks]
+- date: 2025-02-01
+  title: CRIDC 2025 Awards $40,000 to Competition Winners
+  outlet: Georgia Tech Office of Graduate and Postdoctoral Education
+  url: https://grad.gatech.edu/news/cridc-2025-awards-40000-competition-winners
+  papers: [vispile]
+- date: 2024-11-01
+  title: Foley Scholars 2024 Winners and Finalists
+  outlet: Georgia Tech Office of Research
+  url: https://research.gatech.edu/foley-scholars-2024-winners-and-finalists
+- date: 2024-07-01
+  title: Visualization Tool Helps Oceanographers Predict Sediment Sample Hotspots
+  outlet: Georgia Tech School of Interactive Computing
+  url: https://www.cc.gatech.edu/news/visualization-tool-helps-oceanographers-predict-sediment-sample-hotspots
+  papers: [deepsee]
+- date: 2023-04-01
+  title: Adam Coscia Presents Visualizations for Interpreting Large Language Models at GVU Center Research Showcase
+  outlet: NSF AI Institute for Adult Learning in Online Education (AI-ALOE)
+  url: https://aialoe.org/coscia-presents-visualizations-for-interpreting-large-language-models/
+  papers: [knowledgevis]
+- date: 2021-11-01
+  title: "DeepSEE: A Virtual Window Under the Waves"
+  outlet: Schmidt Ocean Institute
+  url: https://schmidtocean.org/cruise-log-post/deepsee-a-virtual-window-under-the-waves/
+  papers: [deepsee]

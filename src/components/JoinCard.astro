@@ -1,0 +1,54 @@
+---
+/** The last card on People: an empty spot on the team, waiting to be filled. */
+import Contours from "./Contours.astro";
+import { JOIN_CARD } from "../graphics/contourSets";
+import Icon from "./Icon.astro";
+---
+
+<a class="join-card" href="/join/">
+  <div class="photo">
+    <Contours {...JOIN_CARD} />
+    <Icon name="trailhead" class="hiker" />
+    <span class="q" aria-hidden="true">?</span>
+  </div>
+  <div class="info">
+    <h3 class="name">This could be you!</h3>
+    <p class="role">Join us!</p>
+    <p class="interests">PhD, master's, and undergraduate researchers. See how to join the expedition →</p>
+  </div>
+</a>
+
+<style>
+  .join-card { display: flex; flex-direction: column; gap: 0.7rem; text-decoration: none; color: var(--ink); }
+  .photo {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px dashed var(--stevens);
+    background: color-mix(in srgb, var(--stevens) 5%, var(--paper));
+    display: grid;
+    place-items: center;
+  }
+  .photo :global(.hiker) { position: relative; font-size: 4.2rem; color: var(--stevens); transition: translate 0.4s; }
+  .join-card:hover .photo :global(.hiker) { translate: 0.4rem 0; }
+  .q {
+    position: absolute;
+    right: 0.9rem;
+    bottom: 0.4rem;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--stevens);
+  }
+  .name { font-family: var(--font-body); font-size: 1.02rem; font-weight: 800; margin: 0; color: var(--stevens); }
+  .role { margin: 0; font-style: italic; color: var(--ink-2); font-size: 0.9rem; }
+  .interests { margin: 0.15rem 0 0; font-size: 0.83rem; color: var(--muted); line-height: 1.45; }
+  .join-card:hover .name { text-decoration: underline; }
+  @media (max-width: 560px) {
+    .join-card { flex-direction: row; align-items: flex-start; gap: 0.9rem; }
+    .photo { width: 96px; flex: none; }
+    .photo :global(.hiker) { font-size: 2.6rem; }
+    .q { font-size: 1.3rem; right: 0.5rem; }
+  }
+</style>

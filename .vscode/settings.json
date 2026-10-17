@@ -1,0 +1,6 @@
+{
+  // The YAML extension downloads schemas from SchemaStore, which assumes any file
+  // named site.yaml is an Ansible playbook and flags every line of src/data/site.yaml.
+  // This repo has no Ansible, so turn SchemaStore off here. YAML syntax checking still works.
+  "yaml.schemaStore.enable": false
+}

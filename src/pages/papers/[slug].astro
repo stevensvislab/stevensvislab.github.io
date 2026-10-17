@@ -1,0 +1,165 @@
+---
+/** Project page for one paper: header, teaser, materials, abstract, and citation. */
+import { getEntry, render } from "astro:content";
+import type { GetStaticPaths } from "astro";
+import Base from "../../layouts/Base.astro";
+import Authors from "../../components/Authors.astro";
+import PaperLinks from "../../components/PaperLinks.astro";
+import Pills from "../../components/Pills.astro";
+import Teaser from "../../components/Teaser.astro";
+import { excerpt, getPapers, getPeopleByName, ogImageUrl, site, teaserUrl, vocab, type Paper } from "../../lib/site";
+
+export const getStaticPaths = (async () => {
+  const papers = await getPapers();
+  return papers.map((paper) => ({ params: { slug: paper.id }, props: { paper } }));
+}) satisfies GetStaticPaths;
+
+const { paper } = Astro.props as { paper: Paper };
+const d = paper.data;
+// Render from the raw collection entry (getPapers() adds tags on top of it).
+const { Content } = await render((await getEntry("papers", paper.id))!);
+const people = await getPeopleByName();
+const partners = d.partners.map((k) => vocab.orgs[k]);
+const citeId = `cite-${paper.id}-page`;
+
+const abstract = (paper.body ?? "").trim();
+const description = excerpt(abstract) || `${d.title}. ${d.venueFull}.`;
+const pageUrl = new URL(`/papers/${paper.id}/`, site.url).href;
+const date = d.month ? `${d.year}/${String(d.month).padStart(2, "0")}` : String(d.year);
+
+// Google Scholar and other academic indexers read these citation_* tags.
+const isPdf = (u?: string) => Boolean(u && /\.pdf($|\?)/i.test(u));
+const absolute = (u: string) => new URL(u, site.url).href;
+const meta = [
+  { name: "citation_title", content: d.title },
+  ...d.authors.map((a) => ({ name: "citation_author", content: a })),
+  { name: "citation_publication_date", content: date },
+  { name: d.type === "journal" ? "citation_journal_title" : "citation_conference_title", content: d.venueFull },
+  ...(d.links.doi ? [{ name: "citation_doi", content: d.links.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//, "") }] : []),
+  ...(isPdf(d.links.pdf) ? [{ name: "citation_pdf_url", content: absolute(d.links.pdf!) }] : []),
+  { name: "citation_abstract_html_url", content: pageUrl },
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ScholarlyArticle",
+  headline: d.title,
+  url: pageUrl,
+  author: d.authors.map((a) => {
+    const member = people.get(a);
+    return { "@type": "Person", name: a, ...(member?.data.links.site ? { url: member.data.links.site } : {}) };
+  }),
+  datePublished: date.replace("/", "-"),
+  abstract: abstract.replace(/\s+/g, " "),
+  isPartOf: { "@type": "CreativeWork", name: d.venueFull },
+  publisher: { "@type": "Organization", name: site.name, url: site.url },
+  inLanguage: "en",
+  ...(d.links.doi ? { sameAs: d.links.doi } : {}),
+  ...(d.award ? { award: d.award } : {}),
+  ...(teaserUrl(paper) ? { image: absolute(teaserUrl(paper)!) } : {}),
+};
+---
+
+<Base
+  title={d.title}
+  bareTitle
+  description={description}
+  editPath={`src/content/papers/${paper.id}.md`}
+  image={ogImageUrl(paper)}
+  imageAlt={d.teaserAlt}
+  meta={meta}
+  jsonLd={jsonLd}
+>
+  <article class="wrap paper-page">
+    <header class="head">
+      <h1>{d.title}</h1>
+      <p class="authors"><Authors authors={d.authors} people={people} /></p>
+      <p class="venue">{d.venueFull}</p>
+      {d.award && <p><span class="blaze">{d.award}</span></p>}
+      <Pills paper={paper} methods />
+      {
+        partners.length > 0 && (
+          <ul class="partners" aria-label="Collaborating organizations">
+            {partners.map((o) => (
+              <li>
+                {o.logo && <img src={`/logos/${o.logo}`} alt="" height="36" loading="lazy" />}
+                <span>{o.name}</span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    <figure class="figure">
+      <Teaser paper={paper} width={1000} loading="eager" />
+    </figure>
+
+    <section class="materials" aria-label="Materials">
+      <PaperLinks paper={paper} buttons cite={false} />
+    </section>
+
+    <section class="abstract prose">
+      <h2>Abstract</h2>
+      <Content />
+    </section>
+
+    {
+      d.bibtex && (
+        <section class="cite" aria-labelledby="cite-h">
+          <h2 id="cite-h">Cite</h2>
+          <pre id={citeId}>{d.bibtex.trim()}</pre>
+          <button type="button" class="copy" data-copy={citeId}>
+            Copy BibTeX
+          </button>
+        </section>
+      )
+    }
+  </article>
+</Base>
+
+<style>
+  .paper-page { max-width: 56rem; padding-top: 2.2rem; }
+  .head { margin: 0 0 1.4rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .head p { margin: 0; }
+  h1 { font-family: var(--font-body); font-weight: 900; font-size: clamp(1.5rem, 3.4vw, 2.2rem); letter-spacing: -0.01em; line-height: 1.2; margin: 0; }
+  .authors { font-size: 1.02rem; color: var(--ink-2); }
+  .venue { font-style: italic; color: var(--muted); }
+  .partners { list-style: none; display: flex; flex-wrap: wrap; gap: 0.7rem 1.6rem; align-items: center; padding: 0; margin: 0.5rem 0 0; }
+  .partners li { display: flex; align-items: center; gap: 0.55rem; }
+  .partners img { height: 36px; width: auto; }
+  .partners span { font-size: 0.88rem; font-weight: 700; color: var(--ink-2); }
+  .figure { margin: 0 0 1.2rem; border-radius: 14px; overflow: hidden; border: 1px solid var(--rule); box-shadow: var(--shadow); background: var(--card); }
+  .figure :global(.teaser) { width: 100%; height: auto; max-height: 34rem; object-fit: contain; }
+  .figure :global(.placeholder) { aspect-ratio: 16 / 7; height: auto; }
+  .materials { margin-bottom: 1.6rem; }
+  /* Every section spans the same width as the teaser. */
+  .abstract { max-width: none; }
+  .abstract :global(p) { font-size: 1.02rem; }
+  .cite { margin-top: 2.2rem; }
+  .cite pre {
+    margin: 0 0 0.7rem;
+    padding: 0.9rem 1rem;
+    border-left: 3px solid var(--stevens);
+    border-radius: 0 8px 8px 0;
+    background: var(--paper-2);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--ink-2);
+  }
+  .copy {
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 800;
+    border: 1px solid var(--rule-strong);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 7px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+  }
+  .copy:hover { border-color: var(--stevens); color: var(--stevens); }
+</style>

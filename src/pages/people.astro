@@ -1,0 +1,84 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import JoinCard from "../components/JoinCard.astro";
+import PersonCard from "../components/PersonCard.astro";
+
+const people = await getCollection("people");
+// Faculty, then PhD, master's, and undergraduate students; alphabetical within a group.
+const order = ["faculty", "phd", "ms", "undergrad"] as const;
+const members = people
+  .filter((p) => (order as readonly string[]).includes(p.data.group))
+  .sort((a, b) => order.indexOf(a.data.group as (typeof order)[number]) - order.indexOf(b.data.group as (typeof order)[number]) || a.data.name.localeCompare(b.data.name));
+const visiting = people.filter((p) => p.data.group === "visiting");
+const alumni = people.filter((p) => p.data.group === "alumni").sort((a, b) => (b.data.end ?? 0) - (a.data.end ?? 0));
+const pets = people.filter((p) => p.data.group === "pet");
+---
+
+<Base title="People" description="Meet the Stevens Visualization Lab: the faculty, Ph.D., master's, and undergraduate researchers, visiting scholars, and alumni." editPath="src/data/people.yaml">
+  <div class="wrap">
+    <header class="page-head">
+      <h1>People</h1>
+      <p class="subtitle">Every adventure needs a fellowship.&nbsp;<Icon name="guidedTours" /></p>
+    </header>
+
+    <section class="group" aria-labelledby="members">
+      <h2 id="members">Our Members</h2>
+      <div class="grid">
+        {members.map((p) => <PersonCard person={p} />)}
+        <JoinCard />
+      </div>
+    </section>
+
+    {
+      visiting.length > 0 && (
+        <section class="group" aria-labelledby="visiting">
+          <h2 id="visiting">Visiting Scholars</h2>
+          <div class="grid">{visiting.map((p) => <PersonCard person={p} />)}</div>
+        </section>
+      )
+    }
+
+    {
+      alumni.length > 0 && (
+        <section class="group" aria-labelledby="alumni">
+          <h2 id="alumni">Alumni</h2>
+          <ul class="alumni">
+            {alumni.map((p) => (
+              <li id={p.id}>
+                <b>{p.data.links.site ? <a href={p.data.links.site}>{p.data.name}</a> : p.data.name}</b> ({p.data.role}
+                {p.data.start && `, ${p.data.start}–${p.data.end ?? ""}`}){p.data.now_at && <> — now at {p.data.now_at}</>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      pets.length > 0 && (
+        <section class="group" aria-labelledby="pets">
+          <h2 id="pets">Pets</h2>
+          <div class="grid">{pets.map((p) => <PersonCard person={p} />)}</div>
+        </section>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .group { padding: 1.4rem 0 1.6rem; }
+  .group + .group { border-top: 1px dashed var(--rule-strong); }
+  .group h2 { font-size: 1.3rem; margin-bottom: 1.1rem; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 1.6rem 1.4rem;
+  }
+  .alumni { columns: 2 22rem; padding-left: 1.1rem; }
+  .alumni li { margin-bottom: 0.4rem; break-inside: avoid; }
+  @media (max-width: 560px) {
+    .grid { grid-template-columns: 1fr; gap: 1.1rem; }
+  }
+</style>

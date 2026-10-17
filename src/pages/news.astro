@@ -1,0 +1,15 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import NewsList from "../components/NewsList.astro";
+---
+
+<Base title="News" description="News from the Stevens Visualization Lab: accepted papers, awards, invited talks, new courses, and lab milestones." editPath="src/data/news.yaml">
+  <div class="wrap narrow">
+    <header class="page-head">
+      <h1>News</h1>
+      <p class="subtitle">Waypoints along the trail.&nbsp;<Icon name="information" /></p>
+    </header>
+    <NewsList />
+  </div>
+</Base>

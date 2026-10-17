@@ -1,0 +1,75 @@
+---
+/**
+ * A paper's teaser image from public/papers/<slug>/ (see teaserUrl). Papers
+ * without one get a contour "map tile" in their theme color with the short name on it.
+ */
+import type { Paper } from "../lib/site";
+import { getThemes, teaserUrl } from "../lib/site";
+import Contours from "./Contours.astro";
+import { tileSpec } from "../graphics/contourSets";
+import PublicImage from "./PublicImage.astro";
+
+interface Props {
+  paper: Paper;
+  /** Render width in CSS px, used to pick a suitably sized copy. */
+  width: number;
+  class?: string;
+  loading?: "lazy" | "eager";
+  priority?: boolean;
+}
+
+const { paper, width, class: className, loading = "lazy", priority = false } = Astro.props;
+const { teaserAlt, short, themes } = paper.data;
+const teaser = teaserUrl(paper);
+const allThemes = await getThemes();
+const color = allThemes.find((t) => t.id === themes[0])?.data.color ?? "ink-2";
+---
+
+{
+  teaser ? (
+    <PublicImage
+      src={teaser}
+      alt={teaserAlt ?? `Teaser image for ${short}`}
+      sizes={`(max-width: 600px) 100vw, ${width}px`}
+      class:list={["teaser", className].filter(Boolean).join(" ")}
+      loading={loading}
+      priority={priority}
+    />
+  ) : (
+    <div class:list={["teaser", "placeholder", className]} style={`--c: var(--${color})`} role="img" aria-label={`${short} (no teaser image yet)`}>
+      <Contours {...tileSpec(paper.id)} color="color-mix(in srgb, var(--c) 40%, transparent)" />
+      <span>{short}</span>
+    </div>
+  )
+}
+
+<style>
+  /* Global, because the <img> is rendered inside PublicImage. */
+  :global(.teaser) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: var(--paper-2);
+  }
+  .placeholder {
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    container-type: inline-size;
+    background: color-mix(in srgb, var(--c) 10%, var(--paper));
+  }
+  .placeholder span {
+    position: relative;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(0.72rem, 11cqi, 2.2rem);
+    color: color-mix(in srgb, var(--c) 85%, var(--ink));
+    background: color-mix(in srgb, var(--paper) 82%, transparent);
+    border-radius: 0.3em;
+    padding: 0.2em 0.5em;
+    text-align: center;
+    line-height: 1.1;
+  }
+</style>

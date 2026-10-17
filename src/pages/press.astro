@@ -1,0 +1,61 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import PaperCompact from "../components/PaperCompact.astro";
+import { formatMonth, getLinkedPaper } from "../lib/site";
+
+const press = await Promise.all(
+  (await getCollection("press"))
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+    .map(async (p) => ({
+      ...p,
+      linked: (await Promise.all(p.data.papers.map((slug) => getLinkedPaper(slug, `press.yaml (${p.data.title})`)))).filter((x) => x !== undefined),
+    })),
+);
+const years = [...new Set(press.map((p) => p.data.date.getUTCFullYear()))];
+---
+
+<Base title="Press" description="Press coverage of research from the Stevens Visualization Lab: articles, awards, and features about our visualization and AI work." editPath="src/data/press.yaml">
+  <div class="wrap narrow">
+    <header class="page-head">
+      <h1>Press</h1>
+      <p class="subtitle">Tales of our heroic deeds.&nbsp;<Icon name="newspaper" /></p>
+    </header>
+    {
+      years.map((year) => (
+        <section class="year">
+          <h2 class="mono">{year}</h2>
+          <ul>
+            {press
+              .filter((p) => p.data.date.getUTCFullYear() === year)
+              .map((p) => (
+                <li>
+                  <a href={p.data.url} rel="noopener">{p.data.title}</a>
+                  <span class="meta">
+                    {p.data.outlet} · {formatMonth(p.data.date)}
+                  </span>
+                  {p.linked.map((paper) => (
+                    <div class="paper">
+                      <PaperCompact paper={paper} />
+                    </div>
+                  ))}
+                </li>
+              ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</Base>
+
+<style>
+  .year { padding: 0.6rem 0 1rem; }
+  .year h2 { font-size: 0.9rem; font-weight: 700; color: var(--muted); letter-spacing: 0.1em; border-bottom: 1px dashed var(--rule-strong); padding-bottom: 0.4rem; }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.9rem; }
+  li { display: flex; flex-direction: column; }
+  li > a { font-weight: 800; font-size: 1.05rem; text-decoration: none; }
+  li > a:hover { text-decoration: underline; }
+  .paper { margin-top: 0.15rem; max-width: 34rem; }
+  .meta { color: var(--muted); font-size: 0.88rem; }
+</style>

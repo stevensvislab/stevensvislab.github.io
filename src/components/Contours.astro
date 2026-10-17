@@ -1,0 +1,43 @@
+---
+/**
+ * Decorative topographic contour texture. The lines live in a small cached SVG
+ * file (/contours/<key>.svg, built from graphics/contourSets.ts) and are used
+ * as a CSS mask, so the page's HTML stays small and the color follows the theme.
+ * Positioned absolutely; place inside a `position: relative` container.
+ */
+import { DEFAULT_FREQUENCY, isKnownSpec, specKey, type ContourSpec } from "../graphics/contourSets";
+
+interface Props {
+  width?: number;
+  height?: number;
+  seed?: number;
+  levels?: number;
+  frequency?: number;
+  class?: string;
+  /** CSS color for the lines. */
+  color?: string;
+}
+
+const { width = 1600, height = 520, seed = 7, levels = 14, frequency = DEFAULT_FREQUENCY, class: className, color = "var(--contour)" } = Astro.props;
+const spec: ContourSpec = { width, height, seed, levels, frequency };
+if (!isKnownSpec(spec)) throw new Error(`Contours: ${specKey(spec)} isn't in src/graphics/contourSets.ts. Use one of the sets listed there.`);
+---
+
+<div class:list={["contours", className]} style={`--line: ${color}; --src: url(/contours/${specKey(spec)}.svg)`} aria-hidden="true"><span></span></div>
+
+<style>
+  .contours {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .contours span {
+    position: absolute;
+    inset: 0;
+    background: var(--line);
+    -webkit-mask: var(--src) center / cover no-repeat;
+    mask: var(--src) center / cover no-repeat;
+  }
+</style>

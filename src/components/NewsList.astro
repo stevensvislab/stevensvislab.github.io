@@ -1,0 +1,58 @@
+---
+/** News as a trail: a dashed line with a waypoint per item; date above, text below. */
+import { getCollection } from "astro:content";
+import { formatMonth, inlineMd } from "../lib/site";
+
+interface Props {
+  limit?: number;
+}
+const { limit } = Astro.props;
+const news = (await getCollection("news")).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const items = limit ? news.slice(0, limit) : news;
+---
+
+<ol class="news">
+  {
+    items.map((n) => (
+      <li>
+        <time datetime={n.data.date.toISOString().slice(0, 10)}>{formatMonth(n.data.date)}</time>
+        <p set:html={inlineMd(n.data.text)} />
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .news {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+  }
+  .news::before {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 0.6rem;
+    bottom: 0.6rem;
+    width: 2px;
+    background-image: linear-gradient(var(--rule-strong) 55%, transparent 0);
+    background-size: 2px 9px;
+  }
+  li { position: relative; padding: 0 0 1.05rem 1.6rem; }
+  li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.42rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2.5px solid var(--forest);
+  }
+  li:first-child::before { background: var(--stevens); border-color: var(--stevens); }
+  time { display: block; font-style: italic; font-size: 0.85rem; color: var(--muted); }
+  p { margin: 0.1rem 0 0; font-size: 0.93rem; line-height: 1.5; }
+  p :global(a) { font-weight: 700; }
+</style>

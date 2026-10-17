@@ -1,0 +1,51 @@
+---
+/**
+ * The three pill families for a paper:
+ *   theme (filled, colored) · domain (#outlined) · method (neutral)
+ * Each pill links to the Papers list filtered by that tag.
+ */
+import type { Paper } from "../lib/site";
+import { getThemes, vocab } from "../lib/site";
+
+interface Props {
+  paper: Paper;
+  methods?: boolean;
+}
+const { paper, methods = false } = Astro.props;
+const themes = await getThemes();
+const byId = new Map(themes.map((t) => [t.id, t]));
+---
+
+<ul class="pills">
+  {
+    paper.data.themes.map((id) => {
+      const t = byId.get(id)!;
+      return (
+        <li>
+          <a class="pill theme" style={`--c: var(--${t.data.color})`} href={`/papers/?theme=${t.id}`} title={t.data.name}>
+            {t.data.short}
+          </a>
+        </li>
+      );
+    })
+  }
+  {
+    paper.data.domains.map((d) => (
+      <li>
+        <a class="pill domain" href={`/papers/?domain=${d}`}>
+          {vocab.domains[d]}
+        </a>
+      </li>
+    ))
+  }
+  {
+    methods &&
+      paper.data.methods.map((m) => (
+        <li>
+          <a class="pill method" href={`/papers/?method=${m}`}>
+            {vocab.methods[m]}
+          </a>
+        </li>
+      ))
+  }
+</ul>

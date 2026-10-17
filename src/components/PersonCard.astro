@@ -1,0 +1,122 @@
+---
+/**
+ * People card: IDL's visual style (photo with the first name overlaid, soft
+ * shading, clear type hierarchy) with GT VA Lab's always-visible content and
+ * links. On phones it becomes a compact row (photo left, text right).
+ */
+import { publicFile, type Person } from "../lib/site";
+import BrandIcon from "./BrandIcon.astro";
+import Contours from "./Contours.astro";
+import { personSpec } from "../graphics/contourSets";
+import PublicImage from "./PublicImage.astro";
+
+interface Props {
+  person: Person;
+}
+const { person } = Astro.props;
+const p = person.data;
+const photo = publicFile("people", p.photo, `people.yaml (${person.id})`);
+
+const links = [
+  p.links.site && { icon: "site", label: "Website", href: p.links.site },
+  p.links.email && { icon: "email", label: "Email", href: `mailto:${p.links.email}` },
+  p.links.scholar && { icon: "scholar", label: "Google Scholar", href: p.links.scholar },
+  p.links.github && { icon: "github", label: "GitHub", href: p.links.github },
+  p.links.linkedin && { icon: "linkedin", label: "LinkedIn", href: p.links.linkedin },
+  p.links.bluesky && { icon: "bluesky", label: "Bluesky", href: p.links.bluesky },
+  p.links.x && { icon: "x", label: "X", href: p.links.x },
+].filter(Boolean) as { icon: "site" | "email" | "scholar" | "github" | "linkedin" | "bluesky" | "x"; label: string; href: string }[];
+const Photo = p.links.site ? "a" : "div";
+---
+
+<article class="person" id={person.id}>
+  {/* The photo links to the person's website, like their name. */}
+  <Photo class="photo" {...(p.links.site ? { href: p.links.site, tabindex: -1, "aria-hidden": "true" } : {})}>
+    {
+      photo ? (
+        <PublicImage src={photo} alt={`Photo of ${p.name}`} sizes="(max-width: 560px) 96px, 240px" />
+      ) : (
+        <div class="placeholder" aria-hidden="true">
+          <Contours {...personSpec(person.id)} />
+        </div>
+      )
+    }
+    <span class="first" aria-hidden="true">{p.first}</span>
+  </Photo>
+  <div class="info">
+    <h3 class="name">{p.links.site ? <a href={p.links.site}>{p.name}</a> : p.name}</h3>
+    <p class="role">{p.role}</p>
+    {p.now_at && <p class="now">Now at {p.now_at}</p>}
+    {p.interests && <p class="interests">{p.interests}</p>}
+    {
+      links.length > 0 && (
+        <ul class="links">
+          {links.map((l) => (
+            <li>
+              <a href={l.href} title={l.label} {...(l.href.startsWith("http") ? { rel: "noopener" } : {})}>
+                <BrandIcon name={l.icon} />
+                <span class="sr-only">{l.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .person { display: flex; flex-direction: column; gap: 0.7rem; }
+  .photo {
+    display: block;
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+  }
+  .photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.92);
+    transition: transform 0.3s, filter 0.3s;
+  }
+  .person:hover .photo :global(img) { transform: scale(1.03); filter: saturate(1.05); }
+  .photo::after {
+    content: "";
+    position: absolute;
+    inset: 55% 0 0 0;
+    background: linear-gradient(transparent, rgb(0 0 0 / 0.5));
+    pointer-events: none;
+  }
+  .placeholder { position: absolute; inset: 0; }
+  .first {
+    position: absolute;
+    left: 0.8rem;
+    bottom: 0.55rem;
+    z-index: 1;
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 3px #000;
+  }
+  .info { display: flex; flex-direction: column; gap: 0.1rem; }
+  .name { font-family: var(--font-body); font-size: 1.02rem; font-weight: 800; margin: 0; letter-spacing: 0; }
+  .name a { text-decoration: none; }
+  .name a:hover { text-decoration: underline; }
+  .role { margin: 0; font-style: italic; color: var(--ink-2); font-size: 0.9rem; }
+  .now { margin: 0; font-size: 0.85rem; color: var(--ink-2); }
+  .interests { margin: 0.15rem 0 0; font-size: 0.83rem; color: var(--muted); line-height: 1.45; }
+  .links { list-style: none; display: flex; gap: 0.15rem; margin: 0.35rem 0 0 -0.35rem; padding: 0; }
+  .links a { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 7px; color: var(--ink-2); }
+  .links a:hover { background: var(--paper-2); color: var(--stevens); }
+  @media (max-width: 560px) {
+    .person { flex-direction: row; align-items: flex-start; gap: 0.9rem; }
+    .photo { width: 96px; flex: none; }
+    .first { display: none; }
+    .photo::after { display: none; }
+  }
+</style>

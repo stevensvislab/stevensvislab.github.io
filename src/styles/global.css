@@ -1,0 +1,559 @@
+:root {
+  color-scheme: light;
+  --paper: #f7f4ec;
+  --paper-2: #efe9dc;
+  --card: #fffdf8;
+  --ink: #22262a;
+  --ink-2: #474e54;
+  --muted: #5f666b;
+  --rule: #ddd6c7;
+  --rule-strong: #c2b9a6;
+  --contour: #cfc6b2;
+  --stevens: #a32638;
+  --stevens-hover: #861d2d;
+  --on-stevens: #ffffff;
+  --forest: #2f6b57;
+  --lake: #2d6a8e;
+  --ochre: #9a6212;
+  --heather: #6e5a8a;
+  --night: #1e2b27;
+  --night-2: #263632;
+  --night-ink: #e9ece6;
+  --night-muted: #a9b5ae;
+  --night-contour: #3a4c46;
+  --shadow: 0 1px 2px rgb(30 43 39 / 0.06), 0 6px 18px rgb(30 43 39 / 0.07);
+
+  --font-display: "National Park Variable", "Nunito Sans Variable", system-ui, sans-serif;
+  --font-body: "Nunito Sans Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --max: 68rem;
+  --gutter: 16px;
+  --radius: 10px;
+  --nav-h: 58px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #121816;
+    --paper-2: #19211e;
+    --card: #1b2421;
+    --ink: #e6e8e3;
+    --ink-2: #c4cac4;
+    --muted: #9aa39e;
+    --rule: #2c3531;
+    --rule-strong: #3d4843;
+    --contour: #2e3a35;
+    --stevens: #e2677a;
+    --stevens-hover: #ee8796;
+    --on-stevens: #1b0a0e;
+    --forest: #74c2a3;
+    --lake: #82bcde;
+    --ochre: #e3b25c;
+    --heather: #bba8db;
+    --night: #0b100e;
+    --night-2: #131b18;
+    --night-contour: #22302b;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 18px rgb(0 0 0 / 0.25);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #121816;
+  --paper-2: #19211e;
+  --card: #1b2421;
+  --ink: #e6e8e3;
+  --ink-2: #c4cac4;
+  --muted: #9aa39e;
+  --rule: #2c3531;
+  --rule-strong: #3d4843;
+  --contour: #2e3a35;
+  --stevens: #e2677a;
+  --stevens-hover: #ee8796;
+  --on-stevens: #1b0a0e;
+  --forest: #74c2a3;
+  --lake: #82bcde;
+  --ochre: #e3b25c;
+  --heather: #bba8db;
+  --night: #0b100e;
+  --night-2: #131b18;
+  --night-contour: #22302b;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 18px rgb(0 0 0 / 0.25);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 24px;
+  }
+}
+/* Mobile: only the one-row nav is sticky (the brand bar is hidden). */
+@media (max-width: 860px) {
+  :root {
+    --nav-h: 41px;
+  }
+}
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--nav-h) + 16px);
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.03rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+main {
+  flex: 1 0 auto;
+  position: relative;
+  isolation: isolate;
+}
+/* Contour texture fading out below the top of each page (see layouts/Base.astro).
+   Fixed height, so the pattern doesn't stretch with the page. The doubled class
+   outranks Contours.astro's own scoped `height: 100%`. */
+main > .contours.top-contours {
+  z-index: -1;
+  bottom: auto;
+  height: 420px;
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.85), transparent 92%);
+  -webkit-mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.85), transparent 92%);
+}
+
+img,
+svg {
+  max-width: 100%;
+  display: block;
+}
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition:
+    color 0.15s,
+    text-decoration-color 0.15s;
+}
+a:hover {
+  color: var(--stevens);
+  text-decoration-color: currentColor;
+}
+
+/* External links get a small "opens elsewhere" arrow. Image and icon links
+   (logos, social icons) are skipped, except paper links, which keep it. */
+:is(main, .site-footer) a[href^="http"]:not(:has(img, svg))::after,
+.paper-links > a[href^="http"]::after {
+  content: "";
+  display: inline-block;
+  width: 0.68em;
+  height: 0.68em;
+  margin-left: 0.28em;
+  vertical-align: 0.02em;
+  background: currentColor;
+  opacity: 0.65;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'%3E%3Cpath d='M6 3H3v10h10v-3M9 2h5v5M14 2 7.5 8.5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'%3E%3Cpath d='M6 3H3v10h10v-3M9 2h5v5M14 2 7.5 8.5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+:focus-visible {
+  outline: 2px solid var(--stevens);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.005em;
+  margin: 0 0 0.5em;
+  text-wrap: balance;
+}
+h1 {
+  font-size: clamp(2rem, 4.6vw, 3.1rem);
+}
+h2 {
+  font-size: clamp(1.45rem, 3vw, 1.9rem);
+}
+h3 {
+  font-size: 1.22rem;
+}
+p {
+  margin: 0 0 1em;
+  text-wrap: pretty;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+.narrow {
+  max-width: 46rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  z-index: 100;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+.skip-link:focus {
+  top: 8px;
+}
+
+/* IDL-style run-in lead: small uppercase tracked label */
+.lead {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* "Visualization" / "VIS" in the lab's name. */
+.vis {
+  color: var(--stevens);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  letter-spacing: 0.02em;
+}
+.muted {
+  color: var(--muted);
+}
+
+/* Icons are inline SVGs sized in em (see components/Icon.astro). */
+.icon {
+  display: inline-block;
+  flex: none;
+  vertical-align: -0.14em;
+}
+svg.icon {
+  max-width: none;
+}
+
+/* ---------- Page sections & the trail ---------- */
+
+.page-head {
+  padding: 2.6rem 0 1.4rem;
+}
+/* Big title, then the subtitle beside it, then the page icon. The subtitle is its
+   own column, so when it wraps its lines start under its first word, not at the
+   page's left edge. */
+.page-head:has(.subtitle),
+.page-head:has(> .icon) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.9rem;
+}
+.page-head h1 {
+  margin: 0;
+}
+.page-head .subtitle {
+  flex: 1 1 12rem;
+  min-width: 0;
+  margin: 0;
+  font-size: clamp(1.02rem, 1.7vw, 1.2rem);
+  font-weight: 600;
+  color: var(--muted);
+}
+.page-head .note {
+  flex-basis: 100%;
+  margin: 0.7rem 0 0;
+  color: var(--muted);
+}
+.page-head .icon {
+  font-size: clamp(1.5rem, 2.8vw, 1.9rem);
+  color: var(--stevens);
+}
+/* Icon at the end of the subtitle text. */
+.page-head .subtitle .icon {
+  margin-left: 0.1rem;
+  vertical-align: -0.2em;
+}
+/* Icon after a title that has no subtitle (About, Join). */
+.page-head > .icon {
+  align-self: baseline;
+  translate: 0 0.2em;
+}
+
+.section {
+  padding: 2.4rem 0;
+}
+.section + .section {
+  border-top: 1px dashed var(--rule-strong);
+}
+
+/* Section heading with a waypoint icon. The icon is inline (not flex) so the
+   heading keeps a text baseline that "All …" links can align to. */
+.waypoint .icon {
+  font-size: 1.05em;
+  color: var(--stevens);
+  margin-right: 0.6rem;
+  vertical-align: -0.12em;
+}
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.1rem;
+}
+.section-head h2 {
+  margin: 0;
+}
+.more-link {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.more-link::after {
+  content: " →";
+}
+
+/* ---------- Pills ---------- */
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pill {
+  --c: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.32em 0.62em;
+  border-radius: 999px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.pill.theme {
+  background: color-mix(in srgb, var(--c) 14%, var(--paper));
+  color: color-mix(in srgb, var(--c) 82%, var(--ink));
+  border: 1px solid color-mix(in srgb, var(--c) 35%, transparent);
+}
+.pill.theme::before {
+  content: "";
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background: var(--c);
+}
+.pill.domain {
+  border: 1px solid var(--rule-strong);
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.pill.domain::before {
+  content: "#";
+  color: var(--muted);
+}
+.pill.method {
+  background: var(--paper-2);
+  color: var(--muted);
+  font-weight: 600;
+  border-radius: 5px;
+}
+a.pill:hover {
+  filter: brightness(0.96);
+  color: inherit;
+}
+
+/* Trail blaze: awards drawn as the painted marks that mark a trail */
+.blaze {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--ochre) 85%, var(--ink));
+}
+.blaze::before {
+  content: "";
+  width: 0.5em;
+  height: 1.05em;
+  background: var(--ochre);
+  border-radius: 1.5px;
+  box-shadow: 0.8em 0 0 -0.08em color-mix(in srgb, var(--ochre) 45%, transparent);
+  margin-right: 0.45em;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  padding: 0.6rem 1.05rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.btn.primary {
+  background: var(--stevens);
+  border-color: var(--stevens);
+  color: var(--on-stevens);
+}
+.btn.primary:hover {
+  background: var(--stevens-hover);
+  border-color: var(--stevens-hover);
+  color: var(--on-stevens);
+}
+
+/* ---------- Callout (shaded "what's important now" block) ---------- */
+
+.callout {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  background: var(--paper-2);
+  border-left: 4px solid var(--stevens);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1rem 1.15rem;
+  margin: 0 0 1.4rem;
+}
+.callout .icon {
+  font-size: 1.7rem;
+  color: var(--stevens);
+}
+.callout p {
+  margin: 0;
+}
+.callout a {
+  font-weight: 800;
+}
+
+/* ---------- Empty states ---------- */
+
+.empty {
+  border: 1.5px dashed var(--rule-strong);
+  border-radius: var(--radius);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--muted);
+}
+.empty .icon {
+  font-size: 2.4rem;
+  margin: 0 auto 0.6rem;
+  display: block;
+}
+
+/* ---------- Epigraphs (prospectus) ---------- */
+
+.epigraph {
+  margin: 0.5rem 0 1.4rem;
+  padding: 0 0 0 1.2rem;
+  border-left: 2px dashed var(--rule-strong);
+}
+.epigraph p {
+  font-size: 1.18rem;
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: 0.4rem;
+}
+.epigraph footer {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* ---------- Prose ---------- */
+
+.prose {
+  max-width: 44rem;
+}
+.prose h2 {
+  margin-top: 2.2rem;
+}
+.prose h3 {
+  margin-top: 1.6rem;
+}
+.prose ul {
+  padding-left: 1.2rem;
+}
+.prose li {
+  margin-bottom: 0.35rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

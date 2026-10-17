@@ -1,0 +1,36 @@
+---
+/**
+ * An icon drawn as inline SVG, centered in a 1em box so it lines up with text.
+ * `name` picks a pictograph: symbols from the NPS map symbol library first,
+ * then the NPS Symbols font as a fallback. `fa` picks a Font Awesome icon (used
+ * for paper links, as on adamcoscia.com). Decorative by default; pass `label`
+ * when the icon carries meaning on its own. Outlines live in src/lib/icons.ts.
+ */
+import { fa as faIcons, nps, symbols } from "../lib/icons";
+
+export type IconName = keyof typeof symbols | keyof typeof nps;
+export type FaName = keyof typeof faIcons;
+
+type Props = { label?: string; class?: string; color?: string } & ({ name: IconName; fa?: never } | { fa: FaName; name?: never });
+
+const { name, fa, label, class: className, color } = Astro.props;
+const symbol = name && name in symbols ? symbols[name as keyof typeof symbols] : undefined;
+const path = fa ? faIcons[fa] : symbol ? undefined : nps[name as keyof typeof nps];
+const viewBox = symbol?.viewBox ?? path!.viewBox;
+const [, , w, h] = viewBox.split(" ").map(Number);
+// Font Awesome glyphs keep their own aspect ratio; pictograph boxes are square.
+const width = fa ? `${(w / h).toFixed(3)}em` : "1em";
+---
+
+<svg
+  class:list={["icon", { fa: Boolean(fa) }, className]}
+  viewBox={viewBox}
+  width={width}
+  height="1em"
+  fill="currentColor"
+  focusable="false"
+  style={color ? `color: ${color}` : undefined}
+  {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": "true" })}
+>
+  {symbol ? <Fragment set:html={symbol.markup} /> : <path d={path!.d} />}
+</svg>
