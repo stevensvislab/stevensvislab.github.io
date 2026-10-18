@@ -1,4 +1,5 @@
-# Paper tags, all in one place. Each tag lists the papers it applies to, so papers don't repeat their tags.
+# Paper tags
+# 
 # The filters, pills, and About-page collaborators on the site are all built from this file.
 #
 # Groups:
@@ -19,36 +20,48 @@
 
 # Application domains
 domains:
+  ai:
+    label: AI
+    papers: [agentk-vast, draftmarks, iscore, knowledgevis, less-is-more, ongoal, prompt-eval, vispile, vista]
   education:
     label: Education
-    papers: [draftmarks, iscore, prompt-eval, vista]
-  intelligence:
-    label: Intelligence analysis
-    papers: [agentk-vast, vispile]
-  decisions:
-    label: Decision-making
-    papers: [lrg, lumos]
+    papers: [draftmarks, iscore, knowledgevis, prompt-eval, vista]
   data-science:
     label: Data science
-    papers: [guidelines]
+    papers: [guidelines, lrg, lumos, biasfuture]
   interactive-ml:
     label: Interactive ML
-    papers: [biasfuture, iscore, knowledgevis]
-  writing:
+    papers: [iscore, knowledgevis, less-is-more]
+  intelligence-analysis:
+    label: Intelligence analysis
+    papers: [agentk-vast, vispile]
+  reading-writing:
     label: Reading & writing
-    papers: [draftmarks, ongoal]
+    papers: [draftmarks]
   ocean-science:
     label: Ocean science
     papers: [deepsee]
-  design:
+  graphic-design:
     label: Graphic design
     papers: [less-is-more]
 
 # Methods and techniques
 methods:
+  llm:
+    label: Large language models
+    papers: [agentk-vast, draftmarks, iscore, knowledgevis, less-is-more, ongoal, prompt-eval, vispile]
+  gen-ai:
+    label: Generative AI
+    papers: [less-is-more]
+  interpretability:
+    label: Interpretability
+    papers: [iscore, knowledgevis, less-is-more]
+  provenance:
+    label: Provenance & traces
+    papers: [agentk-vast, draftmarks, lrg, lumos, ongoal, vispile, vista]
   text-vis:
     label: Text visualization
-    papers: [agentk-vast, vispile]
+    papers: [agentk-vast, draftmarks, iscore, knowledgevis, ongoal, vispile]
   knowledge-graphs:
     label: Knowledge graphs
     papers: [agentk-vast, vispile]
@@ -58,36 +71,15 @@ methods:
   geospatial:
     label: Geospatial & 3D
     papers: [deepsee]
-  provenance:
-    label: Provenance & traces
-    papers: [agentk-vast, draftmarks, guidelines, lrg, lumos, ongoal, vista]
-  interpretability:
-    label: Interpretability
-    papers: [iscore, knowledgevis]
-  llm:
-    label: Large language models
-    papers: [agentk-vast, draftmarks, iscore, knowledgevis, ongoal, prompt-eval, vispile]
-  generative-ai:
-    label: Generative AI
-    papers: [less-is-more]
   co-design:
     label: Co-design
     papers: [deepsee, iscore, vispile, vista]
   field-deployment:
     label: Field deployment
-    papers: [deepsee, iscore]
-  expert-study:
-    label: Expert study
-    papers: [knowledgevis, vispile, vista]
-  user-study:
-    label: Controlled study
-    papers: [draftmarks, guidelines, less-is-more, lrg, lumos, ongoal]
-  evaluation:
-    label: Evaluation methods
-    papers: [prompt-eval]
-  research-agenda:
-    label: Research agenda
-    papers: [biasfuture]
+    papers: [deepsee, iscore, vista]
+  empirical-study:
+    label: Empirical study
+    papers: [draftmarks, guidelines, ongoal, lrg]
 
 # Partner organizations
 partners:
@@ -96,7 +88,7 @@ partners:
     logo: gt-logo.png
     papers: [agentk-vast, biasfuture, deepsee, guidelines, iscore, knowledgevis, lrg, lumos, ongoal, vispile, vista]
   las:
-    label: Laboratory for Analytic Sciences
+    label: NCSU Laboratory for Analytic Sciences
     logo: las-logo.png
     papers: [vispile]
   adobe:

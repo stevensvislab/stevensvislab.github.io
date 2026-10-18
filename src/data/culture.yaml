@@ -1,4 +1,5 @@
-# Lab culture playbook. Shown on the Join page (under "Lab culture") and on the Fun page (under the photos).
+# Lab culture playbook
+#
 # Order here is display order. `paragraphs` and `notes[].text` support **bold**, *italic*, and [links](url).
 #
 # Example:
@@ -37,7 +38,7 @@
     - >-
       You have to trust in yourself and let go of what you cannot control. Comparison is the thief of joy. Making progress
       can mean a lot of things in research, from reading to writing to experimenting to thinking. Trust you are on the right
-      path; your own.
+      path.
     - >-
       New students start on a scoped first project with more hands-on support, then shape later projects around their own
       goals.

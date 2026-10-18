@@ -1,4 +1,6 @@
-# Research themes (home page). Order here is display order.
+# Research themes
+# 
+# Order here is display order.
 #
 # Example:
 # - id: human-ai-collaboration                 # the short name in lowercase with hyphens; papers list it under `themes:`
@@ -12,27 +14,27 @@
 #   selected: [ongoal, vispile]                # paper slugs, shown as compact paper cards
 
 - id: human-ai-collaboration
-  name: Defensible Human-AI Collaboration Using Visualizations
+  name: Visualizations for Traceable and Defensible Human-AI Collaboration
   short: Human-AI Collaboration
   color: forest
   description: >-
-    Today, people offload their data to AI to help them do their work. But when AI acts
-    autonomously on text, graphs, and other data, it can produce insights that are
-    unstructured, non-deterministic, untraceable, and may conflict with human insights,
-    making it hard to know where results came from and who is responsible for them. Visual
-    analytics can bridge this gap by tracing and visualizing the provenance of data
-    operations and AI's reasoning process, helping people and AI communicate their goals,
-    steer each other towards the right outcomes, and verify results against underlying
-    data. We are exploring how to help people verify and steer AI reasoning against
-    underlying data using interactive visualizations.
+    Today, people offload their data to AI to help them do their work. But 
+    when AI acts autonomously on text, graphs, and other data, it can produce 
+    insights that are unstructured, non-deterministic, untraceable, and may 
+    conflict with human insights, making it hard to know where results came 
+    from and who is responsible for them. Visual analytics can bridge this 
+    gap by tracing and visualizing the provenance of data operations and AI's 
+    reasoning process, helping people and AI communicate their goals, guide 
+    each other towards the right outcomes, and verify results against 
+    underlying data. We are exploring how to help people verify and steer 
+    AI reasoning against underlying data using interactive visualizations.
   topics:
     - goal tracking
-    - uncertainty
     - bi-directional communication
     - interactive reasoning
+    - uncertainty
     - automated hypothesis testing
     - team-based collaboration
-    - detecting/mitigating bias
   applications:
     - tabular data
     - text analysis
@@ -43,19 +45,22 @@
   selected: [agentk-vast, ongoal, vispile, guidelines]
 
 - id: ai-in-education
-  name: Visualizations for Trustworthy AI in Education
+  name: Making AI Trustworthy in Education Through Interactive Visualization
   short: AI in Education
   color: lake
   description: >-
-    AI increasingly generates and manipulates data like grades, feedback, and lessons to
-    help us learn and teach more efficiently. But we lack methods to connect what AI does
-    to data and how that gets interpreted by humans, leading multiple stakeholders to
-    distrust the otherwise transformational benefits of AI in education. Visual analytics
-    can surface where, how, and why data was generated and manipulated against learning
-    objectives, making the process of human-AI learning more transparent. We are applying
-    this idea to help engineers measure the pedagogical alignment of AI, help learners
-    adjust their behaviors when viewing their personal interactions with AI, and help
-    instructors assess learning progress and steer the learning objectives of AI.
+    AI increasingly generates and manipulates data like grades, feedback, and 
+    lessons to help us learn and teach more efficiently. But learning is 
+    deeply tied to process, and today's learning technology struggles to 
+    integrate AI reasoning into pedagogy. Without evidence, teachers, 
+    engineers, and students can't tell whether or how AI is serving learning 
+    objectives, causing trust to break down. Visual analytics can surface 
+    where, how, and why data was generated and manipulated against learning 
+    objectives, making the process of human-AI learning more transparent. 
+    We are applying this idea to help engineers measure the pedagogical 
+    alignment of AI, help instructors assess and adjust the learning process
+    in AI-based learning settings, and help learners self-correct behaviors by 
+    viewing their own personal interaction data with AI.
   topics:
     - measuring trustworthiness
     - responsive pedagogy
@@ -65,54 +70,54 @@
   applications:
     - learning engineering
     - learning analytics
-    - classroom-based learning
     - self-directed learning
+    - interactive machine learning
   selected: [draftmarks, vista, iscore, knowledgevis]
-
-- id: bias-aware-va
-  name: Bias-Aware Visual Analytics Using Interaction Traces
-  short: Bias-Aware VA
-  color: ochre
-  description: >-
-    Every analysis leaves a trail. As people explore data, the choices they make about what
-    to look at, filter, and compare can reflect unconscious biases that skew their
-    conclusions, often without them realizing it. Visual analytics can capture these
-    interactions as traces and show them back to analysts in real time, making their own
-    analytic behavior visible and comparable against the data they have yet to explore. We
-    are studying how visualizing interaction traces can increase people's awareness of bias
-    and help them reflect on and adjust how they analyze data.
-  topics:
-    - interaction traces
-    - analytic provenance
-    - awareness of bias
-    - self-reflection
-    - mixed-initiative guidance
-  applications:
-    - tabular data
-    - visual data exploration
-    - decision-making
-  selected: [lumos, lrg, biasfuture]
 
 - id: scientific-discovery
   name: Visual Analytics for Expert-Driven Scientific Discovery
   short: Scientific Discovery
   color: heather
   description: >-
-    Scientists increasingly collect data that is sparse, expensive, and spread across space,
-    time, and many variables at once, like sediment samples drawn from the deep sea floor.
-    But general-purpose analysis tools rarely match how domain experts reason about where to
-    look next, making it hard to spot patterns and plan the next expedition. Visual
-    analytics can bring these measurements together in coordinated, multidimensional views
-    shaped by experts' own questions. We are co-designing interactive systems with
-    scientists in the field to help them explore their data, form hypotheses, and decide
-    where to sample next.
+    Scientific data is often sparse, expensive to collect, and spread across 
+    space, time, and other variables at once. Experts need tools that can help 
+    them extract patterns and value from these rich yet sparse datasets. 
+    Visual analytics can bring these measurements together in coordinated, 
+    multidimensional views, while using AI to help experts ground their 
+    exploration in testable lines of inquiry and hypotheses. We are 
+    co-designing interactive systems with scientists in the field to help 
+    them explore their data, form hypotheses, and decide where to sample next.
   topics:
     - multidimensional visualization
     - spatial and 3D data
-    - co-design
-    - field deployment
+    - automated hypothesis testing
   applications:
     - ocean science
-    - environmental microbiology
-    - geospatial data
+    - quantum computing
+    - human-robot interaction
   selected: [deepsee]
+
+- id: bias-aware-va
+  name: Bias-Aware Visual Analytics Using Interaction Traces
+  short: Bias-Aware VA
+  color: ochre
+  description: >-
+    As people explore data, the choices they make about what to look at, 
+    filter, and compare can reflect unconscious biases that skew their 
+    conclusions, often without them realizing it. Today, this problem is 
+    further compounded by the influence of AI guidance. Visual analytics can 
+    capture interactions with data as traces and show them back to analysts in 
+    real time, making their own analytic behavior visible and comparable 
+    against the data they have yet to explore. We are studying how 
+    visualizing interaction traces can increase people's awareness of bias 
+    and help them reflect on and adjust how they analyze data.
+  topics:
+    - interaction traces
+    - analytic provenance
+    - cognitive bias
+    - mixed-initiative guidance
+  applications:
+    - tabular data
+    - visual data exploration
+    - decision-making
+  selected: [lumos, lrg, biasfuture]

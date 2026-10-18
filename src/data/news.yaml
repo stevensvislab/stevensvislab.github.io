@@ -1,4 +1,6 @@
-# News (home page and /news/). The site sorts by date; items in the same month keep this file's order.
+# News
+# 
+# The site sorts by date; items in the same month keep this file's order.
 # `text` supports **bold**, *italic*, and [links](url). Link a paper page with [Title](/papers/<slug>/).
 #
 # Example:

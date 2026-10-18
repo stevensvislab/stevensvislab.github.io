@@ -1,4 +1,6 @@
-# Site-wide settings and copy. DO NOT EDIT KEYS (hard-coded), ONLY VALUES.
+# Site-wide settings and copy
+# 
+# DO NOT EDIT KEYS (hard-coded), ONLY VALUES.
 # Text fields marked below support **bold**, *italic*, and [links](url).
 #
 # Examples of one item in each list:
@@ -19,7 +21,7 @@ googleSiteVerification: 5HKZ4pkh6oxdUKqLcbqvNDKWgoqoe7NBDu0u9genSjg
 mission: >-
   Our mission is to help people **make sense of complex data**. We combine methods from
   visual analytics, AI, data science, and human-computer interaction to develop new
-  **interactive systems** for data visualization and analysis.
+  interactive systems for **data visualization and analysis**.
 
 # Set `show: false` to hide it. `text` supports **bold**, *italic*, and [links](url).
 announcement:
