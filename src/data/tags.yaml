@@ -37,7 +37,7 @@ domains:
     papers: [agentk-vast, vispile]
   reading-writing:
     label: Reading & writing
-    papers: [draftmarks]
+    papers: [draftmarks, ongoal]
   ocean-science:
     label: Ocean science
     papers: [deepsee]
