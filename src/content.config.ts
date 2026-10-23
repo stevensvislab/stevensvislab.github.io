@@ -11,10 +11,10 @@ import { parse } from "yaml";
 
 const readYaml = (path: string) => parse(readFileSync(new URL(path, import.meta.url), "utf8"));
 
-const themeIds = (readYaml("./data/themes.yaml") as { id: string }[]).map((t) => t.id) as [string, ...string[]];
+const themeIds = (readYaml("./data/research-themes.yaml").themes as { id: string }[]).map((t) => t.id) as [string, ...string[]];
 
-// Domains, methods, and partners now live in tags.yaml; catch them if they're left in a paper.
-const movedToTags = z.never({ error: "this now lives in src/data/tags.yaml (add the paper's slug to the tag there)" }).optional();
+// Domains, methods, and partners now live in paper-tags.yaml; catch them if they're left in a paper.
+const movedToTags = z.never({ error: "this now lives in src/data/paper-tags.yaml (add the paper's slug to the tag there)" }).optional();
 
 /**
  * YAML list → entries with ids (uses `id` if present, else the list position) and
@@ -26,6 +26,23 @@ const listParser = (text: string) =>
     ...entry,
     order: i,
   }));
+
+const themesFile = readYaml("./data/research-themes.yaml") as { palette: Record<string, string>; themes: Record<string, unknown>[] };
+const paletteNames = Object.keys(themesFile.palette);
+
+// Checked here (not in the loader's parser), because the loader swallows parser errors and the build would carry on without themes.
+for (const [name, hex] of Object.entries(themesFile.palette))
+  if (!/^#[0-9a-f]{6}$/i.test(String(hex))) throw new Error(`research-themes.yaml: palette color "${name}" is "${hex}", but it should be a hex color like "#2f6b57"`);
+for (const required of ["forest", "lake", "ochre"])
+  if (!paletteNames.includes(required)) throw new Error(`research-themes.yaml: the palette needs "${required}" (it's also used outside the themes)`);
+themesFile.themes.forEach((theme, i) => {
+  if ("color" in theme) throw new Error(`research-themes.yaml: "${theme.id}" sets color, but colors come from the palette in order (remove the color line)`);
+  if (i >= paletteNames.length) throw new Error(`research-themes.yaml: "${theme.id}" is theme ${i + 1}, but the palette has ${paletteNames.length} colors (add more to \`palette:\`)`);
+});
+
+/** research-themes.yaml → entries, each with the palette color name for its position. */
+const themeParser = (text: string) =>
+  parse(text).themes.map((theme: Record<string, unknown>, i: number) => ({ ...theme, id: String(theme.id), color: paletteNames[i], order: i }));
 
 const optionalUrl = z.string().min(1).optional();
 
@@ -85,12 +102,12 @@ const blog = defineCollection({
 });
 
 const themes = defineCollection({
-  loader: file("./src/data/themes.yaml", { parser: listParser }),
+  loader: file("./src/data/research-themes.yaml", { parser: themeParser }),
   schema: z.object({
     order: z.number(),
     name: z.string(),
     short: z.string(),
-    color: z.enum(["forest", "lake", "ochre", "heather"]),
+    color: z.string(), // palette color name, assigned by position
     description: z.string(),
     topics: z.array(z.string()),
     applications: z.array(z.string()),
@@ -164,19 +181,14 @@ const photos = defineCollection({
   }),
 });
 
-const culture = defineCollection({
-  loader: file("./src/data/culture.yaml", { parser: listParser }),
-  schema: z.object({
-    order: z.number(),
-    title: z.string(),
-    quote: z.object({ text: z.string(), by: z.string(), source: z.string() }),
-    paragraphs: z.array(z.string()),
-    notes: z.array(z.object({ title: z.string(), text: z.string() })).default([]),
-  }),
+// Long-form pages written as Markdown: src/content/documents/<name>.md (lab-culture, prospectus).
+const documents = defineCollection({
+  loader: glob({ pattern: ["*.md", "!README.md"], base: "./src/content/documents" }),
+  schema: z.object({ title: z.string(), description: z.string().optional() }),
 });
 
 const logoEntry = z.object({ name: z.string(), url: z.string(), logo: z.string().optional(), blurb: z.string().optional() });
 const sponsors = defineCollection({ loader: file("./src/data/sponsors.yaml", { parser: listParser }), schema: logoEntry });
 const partners = defineCollection({ loader: file("./src/data/partners.yaml", { parser: listParser }), schema: logoEntry });
 
-export const collections = { papers, blog, themes, people, news, press, courses, photos, sponsors, partners, culture };
+export const collections = { papers, blog, themes, people, news, press, courses, photos, sponsors, partners, documents };

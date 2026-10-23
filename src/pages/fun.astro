@@ -5,10 +5,12 @@
  */
 import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
-import CultureList from "../components/CultureList.astro";
+import Document from "../components/Document.astro";
 import Icon from "../components/Icon.astro";
+import { getDocument, nestHeadings } from "../lib/documents";
 
 const photos = (await getCollection("photos")).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const culture = await getDocument("lab-culture");
 const pets = (await getCollection("people")).filter((p) => p.data.group === "pet");
 ---
 
@@ -58,9 +60,7 @@ const pets = (await getCollection("people")).filter((p) => p.data.group === "pet
 
     <section class="section culture" aria-labelledby="culture">
       <h2 id="culture" class="waypoint"><Icon name="campground" />Lab culture</h2>
-      <div class="prose">
-        <CultureList level="h3" />
-      </div>
+      <Document html={nestHeadings(culture.html, 1)} />
     </section>
   </div>
 </Base>

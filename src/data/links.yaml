@@ -1,0 +1,27 @@
+# Site addresses and links
+#
+# Includes: URL, email, GitHub, social accounts, and the university
+#
+# DO NOT EDIT KEYS (hard-coded), ONLY VALUES.
+#
+# Example of one item in `socials`:
+#   socials:  - { name: Bluesky, icon: bluesky, url: "https://bsky.app/profile/…", handle: "@…" }   # icon: github | youtube | linkedin | bluesky | x
+
+url: https://stevensvislab.github.io
+email: acoscia@stevens.edu
+
+# Google Search Console ownership tag (the `content` value of the google-site-verification meta tag).
+# Leave it in place after verifying: Google re-checks it. Delete the line to remove the tag.
+googleSiteVerification: 5HKZ4pkh6oxdUKqLcbqvNDKWgoqoe7NBDu0u9genSjg
+
+github: https://github.com/stevensvislab
+editBase: https://github.com/stevensvislab/stevensvislab.github.io/edit/main
+
+# Social links (nav + footer). Remove a line to hide it.
+# Supported icons: github, youtube, linkedin, bluesky, x.
+socials:
+  - { name: GitHub, icon: github, url: "https://github.com/stevensvislab", handle: stevensvislab }
+  # Uncomment once the lab accounts exist:
+  # - { name: LinkedIn, icon: linkedin, url: "https://www.linkedin.com/groups/…", handle: Stevens VIS Lab }
+  # - { name: YouTube, icon: youtube, url: "https://www.youtube.com/@…", handle: "@…" }
+  # - { name: Bluesky, icon: bluesky, url: "https://bsky.app/profile/…", handle: "@…" }

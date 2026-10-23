@@ -11,7 +11,7 @@ import Contours from "../components/Contours.astro";
 import Footer from "../components/Footer.astro";
 import { topSpec } from "../graphics/contourSets";
 import Nav from "../components/Nav.astro";
-import { site } from "../lib/site";
+import { paletteCss, site } from "../lib/site";
 
 interface Props {
   title?: string;
@@ -62,6 +62,7 @@ const jsonLdText = jsonLd ? JSON.stringify(jsonLd).replace(/</g, "\\u003c") : un
     <meta name="description" content={description} />
     {site.googleSiteVerification && <meta name="google-site-verification" content={site.googleSiteVerification} />}
     <link rel="canonical" href={canonical} />
+    <style is:inline set:html={paletteCss} />
     <link rel="preload" href={nunitoSans} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={nationalPark} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

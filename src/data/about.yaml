@@ -1,0 +1,72 @@
+# About the lab
+#
+# Includes: name, mission, What we do, values, and location
+#
+# DO NOT EDIT KEYS (hard-coded), ONLY VALUES.
+# Text fields marked below support **bold**, *italic*, and [links](url).
+#
+# Example of one item in `values`:
+#   values:   - { title: Share what we learn, text: "One or two sentences." }
+
+name: Stevens Visualization Lab
+shortName: VIS Lab @ Stevens
+institution:
+  name: Stevens Institute of Technology
+  url: https://www.stevens.edu
+  school: School of Computing
+  schoolUrl: https://www.stevens.edu/school-computing
+location:
+  building: Gateway South, Room 349
+  street: 1 Castle Point Terrace
+  city: Hoboken, NJ 07030
+  coords: "40.745° N, 74.025° W"
+
+# Supports **bold**, *italic*, and [links](url).
+mission: >-
+  Our mission is to help people **make sense of complex data**. We combine methods from AI, data science, and 
+  human-computer interaction to develop interactive systems for **data visualization and analysis**.
+
+# Set `show: false` to hide it. `text` supports **bold**, *italic*, and [links](url).
+announcement:
+  show: true
+  text: "**We're recruiting PhD students for Fall 2027!** Master's, undergraduate, and visiting scholars are also welcome to join the expedition."
+  link: /join/
+  linkText: How to join
+
+# Supports **bold**, *italic*, and [links](url). Link a phrase to a paper with [phrase](/papers/<slug>/).
+# Keep each link on one line.
+whatWeDo:
+  - >-
+    We have developed interactive systems for visualizing [text documents](/papers/vispile/), [tabular data](/papers/lumos/),
+    and [knowledge graphs](/papers/agentk-vast/), tackling hard problems in [sensemaking](/papers/guidelines/),
+    [human-AI collaboration](/papers/ongoal/), and [AI trustworthiness](/papers/knowledgevis/), with applications across
+    [education](/papers/vista/), [data science](/papers/lrg/), [intelligence analysis](/papers/vispile/),
+    [interactive machine learning](/papers/iscore/), [ocean science](/papers/deepsee/), and
+    [graphic design](/papers/less-is-more/).
+  - >-
+    We are highly interdisciplinary! We demonstrate impact by engaging in [iterative co-design](/papers/deepsee/) and
+    [longitudinal field deployments](/papers/iscore/) with real domain experts. Our work contributes open-source software,
+    empirical studies, and design guidelines to visualization, HCI, and AI communities.
+
+# `text` supports **bold**, *italic*, and [links](url).
+values:
+  - title: Research is an adventure
+    text: >-
+      You have a vague idea of a goal, but you're not sure how you'll get there or what challenges you'll face along
+      the way. You only get where you're going by taking that first step out the door.
+  - title: Build with the people who use it
+    text: >-
+      We demonstrate impact by engaging in iterative co-design and longitudinal field deployments with real domain
+      experts.
+  - title: Trust your own path
+    text: >-
+      Comparison is the thief of joy. Making progress can mean a lot of things in research, from reading to writing to
+      experimenting to thinking.
+  - title: Research is social
+    text: >-
+      Your best ideas will come from hanging out with interesting people. When times are tough, your colleagues, peers,
+      and friends will lift you up.
+  - title: Share what we learn
+    text: >-
+      Our work contributes open-source software, empirical studies, and design guidelines to visualization, HCI, and AI
+      communities.

@@ -1,6 +1,4 @@
-# private source material (not site content)
-notes/
-personalsite/
+website-notes/
 
 # build output and dependencies
 node_modules/

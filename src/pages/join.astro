@@ -1,63 +1,35 @@
 ---
 /**
- * Join / Prospectus. Structure follows the Data & Design Group's recruiting
- * page in four parts (what to expect, lab culture, resources, how to apply),
- * with lab-culture sections in the style of the VIS Design Lab and a Tolkien
- * epigraph under each culture heading (from src/data/culture.yaml).
+ * Join / Prospectus. The page text is a Markdown document (src/content/documents/prospectus.md);
+ * this page adds the head, the announcement, and an "On this page" list built from its headings.
+ * The line `<!-- lab-culture -->` in the prospectus is replaced by the lab culture document.
  */
-import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
-import CultureList from "../components/CultureList.astro";
+import Document from "../components/Document.astro";
 import Icon from "../components/Icon.astro";
-import { getThemes, inlineMd, site } from "../lib/site";
+import { getDocument, nestHeadings, outline } from "../lib/documents";
+import { inlineMd, site } from "../lib/site";
 
-const themes = await getThemes();
-const partners = await getCollection("partners");
-const culture = (await getCollection("culture")).sort((a, b) => a.data.order - b.data.order);
-const phdPrograms = site.programs.filter((p) => p.level === "phd");
-const msPrograms = site.programs.filter((p) => p.level === "ms");
+const prospectus = await getDocument("prospectus");
+const culture = await getDocument("lab-culture");
+const html = prospectus.html.replace(/<!--\s*lab-culture\s*-->/, nestHeadings(culture.html, 1));
 
-const toc = [
-  {
-    id: "expect",
-    title: "What you should expect",
-    items: [
-      { id: "work", title: "What we work on" },
-      { id: "looking-for", title: "Who we're looking for" },
-      { id: "research", title: "How we do research" },
-    ],
-  },
-  { id: "culture", title: "Lab culture", items: culture.map((c) => ({ id: c.id, title: c.data.title })) },
-  {
-    id: "resources",
-    title: "Resources for the journey",
-    items: [
-      { id: "why-stevens", title: "Why Stevens?" },
-      { id: "funding", title: "Funding" },
-      { id: "partner-labs", title: "Partner labs" },
-      { id: "internships", title: "Internships" },
-    ],
-  },
-  {
-    id: "apply",
-    title: "How to apply",
-    items: [
-      { id: "prospective", title: "Prospective Ph.D. students" },
-      { id: "current-students", title: "Current Stevens master's and undergraduate students" },
-      { id: "visiting", title: "Visiting research scholars and interns" },
-    ],
-  },
-];
+// "On this page": each h2 with the h3s under it.
+const toc: { id: string; text: string; items: { id: string; text: string }[] }[] = [];
+for (const h of outline(html)) {
+  if (h.depth === 2) toc.push({ id: h.id, text: h.text, items: [] });
+  else toc.at(-1)?.items.push({ id: h.id, text: h.text });
+}
 ---
 
 <Base
   title="Join us"
   description="Join the Stevens Visualization Lab as a Ph.D., master's, or undergraduate student, or as a visiting scholar or intern. What to expect and how to apply."
-  editPath="src/pages/join.astro"
+  editPath="src/content/documents/prospectus.md"
 >
   <div class="wrap narrow">
     <header class="page-head">
-      <h1>Join the expedition</h1>
+      <h1>{prospectus.title}</h1>
       <Icon name="trailhead" />
       <p class="note">We're building a lab of curious people who want to help others make sense of complex data.</p>
     </header>
@@ -77,11 +49,11 @@ const toc = [
         {
           toc.map((part) => (
             <li>
-              <a href={`#${part.id}`}>{part.title}</a>
+              <a href={`#${part.id}`}>{part.text}</a>
               <ul>
                 {part.items.map((item) => (
                   <li>
-                    <a href={`#${item.id}`}>{item.title}</a>
+                    <a href={`#${item.id}`}>{item.text}</a>
                   </li>
                 ))}
               </ul>
@@ -91,198 +63,7 @@ const toc = [
       </ol>
     </nav>
 
-    <article class="prose">
-      <section id="expect" class="part">
-        <h2>What you should expect</h2>
-
-        <section id="work">
-          <h3>What we work on</h3>
-          <p>{site.mission.replace(/\*\*/g, "")}</p>
-          <ul class="themes">
-            {
-              themes.map((t) => (
-                <li style={`--c: var(--${t.data.color})`}>
-                  <a href={`/#${t.id}`}>
-                    <b>{t.data.name}</b>
-                  </a>
-                  <span>{t.data.topics.slice(0, 4).join(" · ")}</span>
-                </li>
-              ))
-            }
-          </ul>
-          <p>
-            Browse <a href="/papers/">all of our papers</a> to see the kinds of systems, studies, and guidelines we produce.
-          </p>
-        </section>
-
-        <section id="looking-for">
-          <h3>Who we're looking for</h3>
-          <p>
-            We're looking for self-motivated students who want to build visual analytics, human-centered AI, and data
-            science tools to solve pressing human-centered, data-driven problems. Nobody arrives knowing everything;
-            these are the skills we use and teach along the way:
-          </p>
-          <ul>
-            <li><b>Data visualization:</b> temporal, networks, tabular, text, geospatial, 3D</li>
-            <li>
-              <b>Data mining and analysis:</b> regression, clustering, dimensionality reduction, aligning with domain needs,
-              reporting, dashboards
-            </li>
-            <li><b>AI and machine learning:</b> training, fine-tuning, evaluating, prompt engineering</li>
-            <li><b>Human subjects research:</b> think-aloud, interviewing, mixed methods, thematic analysis</li>
-            <li><b>UI/UX:</b> design, interaction, prototyping, implementation, evaluation</li>
-          </ul>
-          <p>
-            In your application, tell us what you're curious about and why. Be yourself rather than writing what you
-            think we want to hear.
-          </p>
-        </section>
-
-        <section id="research">
-          <h3>How we do research: a typical expedition</h3>
-          <ol class="steps">
-            <li>
-              <b>Meet a domain expert with a data problem.</b> Someone is sitting down to look at data and make a decision,
-              and the tools they have aren't enough.
-            </li>
-            <li>
-              <b>Map the terrain.</b> Building tools requires three things: the <em>task</em> (what do we need to make sense
-              of?), the <em>data</em> (where will answers come from?), and the <em>users</em> (who is interpreting the results?).
-            </li>
-            <li>
-              <b>Build the tool.</b> Systems, interfaces, algorithms, and libraries for doing data science, for experts and
-              novices alike, co-designed with the people who will use them.
-            </li>
-            <li>
-              <b>Study it in the field.</b> We study how people use our tools to interpret data and how interaction and visualization
-              impact decision-making, through mixed methods, human-subjects studies with domain experts, and longitudinal
-              deployments.
-            </li>
-            <li>
-              <b>Share what we learned.</b> Open-source software, empirical studies, and design guidelines for the community.
-            </li>
-          </ol>
-        </section>
-      </section>
-
-      <section id="culture" class="part">
-        <h2>Lab culture</h2>
-        <CultureList level="h3" />
-      </section>
-
-      <section id="resources" class="part">
-        <h2>Resources for the journey</h2>
-
-        <section id="why-stevens">
-          <h3>Why Stevens?</h3>
-          <p>
-            Stevens Institute of Technology sits on Castle Point in Hoboken, New Jersey, directly across the Hudson
-            River from Manhattan. Students are a short trip from New York City's technology, finance, media, and
-            healthcare communities.
-          </p>
-        </section>
-
-        <section id="funding">
-          <h3>Funding</h3>
-          <p>
-            Ph.D. students in the {
-              phdPrograms.map((p, i) => (
-                <>
-                  {i > 0 && " and "}
-                  <a href={p.url} rel="noopener">
-                    {p.name}
-                  </a>
-                </>
-              ))
-            } programs receive fully funded doctoral study. For Stevens master's and undergraduate students, research credit,
-            independent studies, and paid positions may be available depending on the term.
-          </p>
-        </section>
-
-        {
-          partners.length > 0 && (
-            <section id="partner-labs">
-              <h3>Partner labs</h3>
-              <p>On campus, we work alongside:</p>
-              <ul class="programs">
-                {partners.map((p) => (
-                  <li>
-                    <a href={p.data.url} rel="noopener">
-                      <b>{p.data.name}</b>
-                    </a>
-                    {p.data.blurb && <span>{p.data.blurb}</span>}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )
-        }
-
-        <section id="internships">
-          <h3>Internships</h3>
-          <p>
-            Summer research internships in industry and at national labs are a great way to grow as a researcher. Adam
-            interned at NASA JPL, Adobe Research, and MIT Lincoln Laboratory during his Ph.D. and is happy to talk
-            through internship options with lab members.
-          </p>
-        </section>
-      </section>
-
-      <section id="apply" class="part">
-        <h2>How to apply</h2>
-        <p>If you made it this far and liked what you saw, then give us a shout :)</p>
-
-        <section id="prospective">
-          <h3>Prospective Ph.D. students</h3>
-          <p>
-            Apply through one of these Stevens programs and name Adam Coscia as a potential advisor in your statement:
-          </p>
-          <ul class="programs">
-            {
-              phdPrograms.map((p) => (
-                <li>
-                  <a href={p.url} rel="noopener">
-                    <b>{p.name}</b>
-                  </a>
-                  <span>{p.blurb}</span>
-                </li>
-              ))
-            }
-          </ul>
-        </section>
-
-        <section id="current-students">
-          <h3>Current Stevens master's and undergraduate students</h3>
-          <p>
-            You don't need prior research experience. If a project here sparks your curiosity, email Adam with a few
-            sentences on what interests you, your CV, and a link to anything you've built (a class project counts!).
-            Research credit, independent studies, and paid positions may be available depending on the term.
-          </p>
-          {
-            msPrograms.length > 0 && (
-              <ul class="programs">
-                {msPrograms.map((p) => (
-                  <li>
-                    <a href={p.url} rel="noopener">
-                      <b>{p.name}</b>
-                    </a>
-                    <span>{p.blurb}</span>
-                  </li>
-                ))}
-              </ul>
-            )
-          }
-        </section>
-
-        <section id="visiting">
-          <h3>Visiting research scholars and interns</h3>
-          <p>
-            Visiting students, scholars, and summer interns are welcome to join the expedition too. Email Adam with a
-            few sentences on what you'd like to work on, your CV, and when and for how long you'd like to visit.
-          </p>
-        </section>
-      </section>
-    </article>
+    <Document html={html} />
   </div>
 </Base>
 
@@ -314,51 +95,5 @@ const toc = [
   }
   .toc ul li {
     margin-bottom: 0.1rem;
-  }
-  .prose section {
-    scroll-margin-top: 90px;
-  }
-  .part {
-    padding-top: 0.6rem;
-  }
-  .part + .part {
-    margin-top: 2.2rem;
-    border-top: 1px dashed var(--rule-strong);
-  }
-  .part > section + section {
-    margin-top: 1.6rem;
-  }
-  .themes,
-  .programs {
-    list-style: none;
-    padding: 0 !important;
-    display: grid;
-    gap: 0.7rem;
-  }
-  .themes li {
-    border-left: 4px solid var(--c);
-    padding-left: 0.8rem;
-    display: flex;
-    flex-direction: column;
-  }
-  .themes span,
-  .programs span {
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
-  .programs li {
-    display: flex;
-    flex-direction: column;
-  }
-  .steps {
-    padding-left: 1.3rem;
-  }
-  .steps li {
-    margin-bottom: 0.7rem;
-  }
-  .steps li::marker {
-    font-family: var(--font-display);
-    font-weight: 800;
-    color: var(--stevens);
   }
 </style>

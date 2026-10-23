@@ -1,0 +1,135 @@
+# Research themes
+#
+# `themes:` is in display order. Each theme gets the next color from `palette:`, top to bottom, so
+# reordering themes recolors them. Add colors to the palette for more themes. Colors are used for pills,
+# filters, and the research map; a lighter version is made automatically for dark mode.
+# `forest`, `lake`, and `ochre` are also used elsewhere on the site, so keep those three.
+#
+# Example of one theme:
+#   - id: human-ai-collaboration                 # the short name in lowercase with hyphens; papers list it under `themes:`
+#     name: Defensible Human-AI Collaboration Using Visualizations
+#     short: Human-AI Collaboration              # short label for pills, filters, and the research map
+#     description: >-
+#       A paragraph about the theme.
+#     topics: [goal tracking, uncertainty]
+#     applications: [tabular data, text analysis]
+#     selected: [ongoal, vispile]                # paper slugs, shown as compact paper cards
+
+# name: hex (pick colors that read well as text on the cream page background)
+palette:
+  forest: "#2f6b57"
+  lake: "#2d6a8e"
+  heather: "#6e5a8a"
+  ochre: "#9a6212"
+  clay: "#a3523a"
+  teal: "#1f7373"
+  rose: "#a2476b"
+  slate: "#4d5f78"
+  moss: "#5f7326"
+  plum: "#7a3f7a"
+
+themes:
+  - id: human-ai-collaboration
+    name: Visualizations for Traceable and Defensible Human-AI Collaboration
+    short: Human-AI Collaboration
+    description: >-
+      Today, people offload their data to AI to help them do their work. But 
+      when AI acts autonomously on text, graphs, and other data, it can produce 
+      insights that are unstructured, non-deterministic, untraceable, and may 
+      conflict with human insights, making it hard to know where results came 
+      from and who is responsible for them. Visual analytics can bridge this 
+      gap by tracing and visualizing the provenance of data operations and AI's 
+      reasoning process, helping people and AI communicate their goals, guide 
+      each other towards the right outcomes, and verify results against 
+      underlying data. We are exploring how to help people verify and steer 
+      AI reasoning against underlying data using interactive visualizations.
+    topics:
+      - goal tracking
+      - bi-directional communication
+      - interactive reasoning
+      - uncertainty
+      - automated hypothesis testing
+      - team-based collaboration
+    applications:
+      - tabular data
+      - text analysis
+      - knowledge graphs
+      - intelligence analysis
+      - human-robot interaction
+      - interactive machine learning
+    selected: [agentk-vast, ongoal, vispile, guidelines]
+
+  - id: ai-in-education
+    name: Making AI Trustworthy in Education Through Interactive Visualization
+    short: AI in Education
+    description: >-
+      AI increasingly generates and manipulates data like grades, feedback, and 
+      lessons to help us learn and teach more efficiently. But learning is 
+      deeply tied to process, and today's learning technology struggles to 
+      integrate AI reasoning into pedagogy. Without evidence, teachers, 
+      engineers, and students can't tell whether or how AI is serving learning 
+      objectives, causing trust to break down. Visual analytics can surface 
+      where, how, and why data was generated and manipulated against learning 
+      objectives, making the process of human-AI learning more transparent. 
+      We are applying this idea to help engineers measure the pedagogical 
+      alignment of AI, help instructors assess and adjust the learning process
+      in AI-based learning settings, and help learners self-correct behaviors by 
+      viewing their own personal interaction data with AI.
+    topics:
+      - measuring trustworthiness
+      - responsive pedagogy
+      - personal data tracking
+      - self-reflection
+      - adaptive reading/writing
+    applications:
+      - learning engineering
+      - learning analytics
+      - self-directed learning
+      - interactive machine learning
+    selected: [draftmarks, vista, iscore, knowledgevis]
+
+  - id: scientific-discovery
+    name: Visual Analytics for Expert-Driven Scientific Discovery
+    short: Scientific Discovery
+    description: >-
+      Scientific data is often sparse, expensive to collect, and spread across 
+      space, time, and other variables at once. Experts need tools that can help 
+      them extract patterns and value from these rich yet sparse datasets. 
+      Visual analytics can bring these measurements together in coordinated, 
+      multidimensional views, while using AI to help experts ground their 
+      exploration in testable lines of inquiry and hypotheses. We are 
+      co-designing interactive systems with scientists in the field to help 
+      them explore their data, form hypotheses, and decide where to sample next.
+    topics:
+      - multidimensional visualization
+      - spatial and 3D data
+      - automated hypothesis testing
+    applications:
+      - ocean science
+      - quantum computing
+      - human-robot interaction
+    selected: [deepsee]
+
+  - id: bias-aware-va
+    name: Bias-Aware Visual Analytics Using Interaction Traces
+    short: Bias-Aware VA
+    description: >-
+      As people explore data, the choices they make about what to look at, 
+      filter, and compare can reflect unconscious biases that skew their 
+      conclusions, often without them realizing it. Today, this problem is 
+      further compounded by the influence of AI guidance. Visual analytics can 
+      capture interactions with data as traces and show them back to analysts in 
+      real time, making their own analytic behavior visible and comparable 
+      against the data they have yet to explore. We are studying how 
+      visualizing interaction traces can increase people's awareness of bias 
+      and help them reflect on and adjust how they analyze data.
+    topics:
+      - interaction traces
+      - analytic provenance
+      - cognitive bias
+      - mixed-initiative guidance
+    applications:
+      - tabular data
+      - visual data exploration
+      - decision-making
+    selected: [lumos, lrg, biasfuture]

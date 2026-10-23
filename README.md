@@ -59,8 +59,8 @@ git push -u origin add-my-paper
 | To add or change...                     | Edit                                                             |
 | --------------------------------------- | ---------------------------------------------------------------- |
 | A paper                                 | `src/content/papers/<slug>.md` (copy an existing one)            |
-| A paper's teaser, PDFs, slides, demos   | `public/papers/<slug>/` (the teaser is `teaser.png`)             |
-| Paper tags (domains, methods, partners) | `src/data/tags.yaml` (each tag lists its papers)                 |
+| A paper's teaser, PDFs, slides, demos   | `public/papers/<slug>/` (`teaser.png`, `teaser-mini.png`)        |
+| Paper tags (domains, methods, partners) | `src/data/paper-tags.yaml` (each tag lists its papers)           |
 | People                                  | `src/data/people.yaml` + photo in `public/people/`               |
 | News                                    | `src/data/news.yaml`                                             |
 | Press                                   | `src/data/press.yaml`                                            |
@@ -73,9 +73,10 @@ Every file is checked against a schema when the site builds (`src/content.config
 
 ### Where files live
 
-- **`src/content/` and `src/data/`**: text and data (Markdown and YAML).
+- **`src/content/`**: writing, as Markdown (papers, blog posts, prospectus, and lab culture).
+- **`src/data/`**: lists and settings, as YAML.
 - **`public/`**: every image and file, served as-is at the same path (`public/people/jane.jpg` → `/people/jane.jpg`):
-  - `public/papers/<slug>/`: a paper's teaser, PDFs, slides, posters, and demos
+  - `public/papers/<slug>/`: a paper's teaser, mini teaser, PDFs, slides, posters, and demos
   - `public/people/`: lab member photos
   - `public/photos/`: Fun page photos
   - `public/blog/`: blog images
@@ -91,8 +92,8 @@ The topographic background lines are not files you edit. They're built from `src
 1. Go to: `src/content/papers/`.
 2. Create `<slug>.md`, where the slug is short, lowercase, and hyphenated (e.g. `ongoal`); it becomes the page URL `/papers/<slug>/`.
 3. Add the paper content to the markdown file (see below).
-4. Make the folder `public/papers/<slug>/` and put the teaser image in it as `teaser.png` (or `.jpg`), plus any PDFs or slides.
-5. Tag the paper: add its slug to the right tags in `src/data/tags.yaml` (see [Tagging a paper](#tagging-a-paper)).
+4. Make the folder `public/papers/<slug>/`. Put a teaser image in it as `teaser.png` (used on paper page and carousel), a smaller, cropped version as `teaser-mini.png` (used on paper cards and lists), plus any PDFs or slides.
+5. Tag the paper: add its slug to the right tags in `src/data/paper-tags.yaml` (see [Tagging a paper](#tagging-a-paper)).
 
 ```yaml
 ---
@@ -104,7 +105,7 @@ venueFull: ACM Conference on Human Factors in Computing Systems (CHI), XXXX
 year: XXXX
 month: 4 # optional: publication month (1-12); sorts papers within a year
 type: conference # journal | conference | workshop | poster | thesis
-themes: [human-ai-collaboration] # ids from themes.yaml (first = primary); may be []
+themes: [human-ai-collaboration] # ids from research-themes.yaml (first = primary); may be []
 builds_on: [ongoal] # optional: draws a dashed trail on the Research Map (currently hidden)
 award: Best Paper Award # optional
 featured: true # optional: show in the home-page carousel
@@ -125,9 +126,9 @@ Abstract goes here (Markdown).
 
 #### Tagging a paper
 
-Each tag lists the papers it applies to and are used site-wide. All tags live in `src/data/tags.yaml`, grouped into `domains`, `methods`, and `partners`.
+Each tag lists the papers it applies to and are used site-wide. All tags live in `src/data/paper-tags.yaml`, grouped into `domains`, `methods`, and `partners`.
 
-1. Go to: `src/data/tags.yaml`.
+1. Go to: `src/data/paper-tags.yaml`.
 2. Add the paper's slug to each tag that fits: `papers: [ongoal, my-new-paper]`.
 3. To make a new tag, copy the example at the top of the file. Partner logos go in `public/logos/`.
 

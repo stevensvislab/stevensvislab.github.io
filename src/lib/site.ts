@@ -1,10 +1,12 @@
-/** Site-wide data: settings from site.yaml, paper tags from tags.yaml, and lookup helpers. */
+/** Site-wide data: copy from about.yaml, addresses from links.yaml, paper tags from paper-tags.yaml, and lookup helpers. */
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { getCollection, type CollectionEntry } from "astro:content";
 import { parse } from "yaml";
-import siteYaml from "../data/site.yaml?raw";
-import tagsYaml from "../data/tags.yaml?raw";
+import aboutYaml from "../data/about.yaml?raw";
+import linksYaml from "../data/links.yaml?raw";
+import tagsYaml from "../data/paper-tags.yaml?raw";
+import themesYaml from "../data/research-themes.yaml?raw";
 
 export interface Social {
   name: string;
@@ -28,13 +30,13 @@ export interface Site {
   editBase: string;
   socials: Social[];
   institution: { name: string; url: string; school: string; schoolUrl: string };
-  programs: { name: string; url: string; blurb: string; level: "phd" | "ms" }[];
 }
 
-export const site = parse(siteYaml) as Site;
+/** about.yaml and links.yaml, merged. */
+export const site = { ...parse(aboutYaml), ...parse(linksYaml) } as Site;
 
 type TagGroup = Record<string, { label: string; logo?: string; papers: string[] }>;
-/** tags.yaml: each tag's label (and logo, for partners) plus the papers it applies to. */
+/** paper-tags.yaml: each tag's label (and logo, for partners) plus the papers it applies to. */
 export const tags = parse(tagsYaml) as { domains: TagGroup; methods: TagGroup; partners: TagGroup };
 
 /** Tag key → display label (or label + logo for partners). */
@@ -48,8 +50,32 @@ export const vocab = {
   orgs: Record<string, { name: string; logo?: string }>;
 };
 
+/** The theme color palette (name → hex) from research-themes.yaml. */
+export const themePalette = (parse(themesYaml) as { palette: Record<string, string> }).palette;
+
+/** A lighter version of a palette color for dark mode: same hue and saturation, fixed lightness. */
+function lighten(hex: string, lightness = 0.66): string {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  const l = (max + min) / 2;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  const h = d === 0 ? 0 : max === r ? ((g - b) / d + 6) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  const c = (1 - Math.abs(2 * lightness - 1)) * s;
+  const x = c * (1 - Math.abs((h % 2) - 1));
+  const m = lightness - c / 2;
+  const [r1, g1, b1] = [[c, x, 0], [x, c, 0], [0, c, x], [0, x, c], [x, 0, c], [c, 0, x]][Math.floor(h) % 6];
+  return "#" + [r1, g1, b1].map((v) => Math.round((v + m) * 255).toString(16).padStart(2, "0")).join("");
+}
+
+/** CSS custom properties for the palette (--forest, --clay, …), with dark-mode versions. */
+export const paletteCss = (() => {
+  const light = Object.entries(themePalette).map(([k, v]) => `--${k}:${v}`).join(";");
+  const dark = Object.entries(themePalette).map(([k, v]) => `--${k}:${lighten(v)}`).join(";");
+  return `:root{${light}}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){${dark}}}:root[data-theme="dark"]{${dark}}`;
+})();
+
 type PaperEntry = CollectionEntry<"papers">;
-/** A paper with its tags from tags.yaml attached. */
+/** A paper with its tags from paper-tags.yaml attached. */
 export type Paper = Omit<PaperEntry, "data"> & {
   data: Omit<PaperEntry["data"], "domains" | "methods" | "partners"> & { domains: string[]; methods: string[]; partners: string[] };
 };
@@ -63,7 +89,7 @@ export async function getPapers(): Promise<Paper[]> {
   for (const [group, list] of Object.entries(tags))
     for (const [key, tag] of Object.entries(list))
       for (const slug of tag.papers ?? [])
-        if (!slugs.has(slug)) throw new Error(`tags.yaml: ${group} → ${key} lists unknown paper "${slug}"`);
+        if (!slugs.has(slug)) throw new Error(`paper-tags.yaml: ${group} → ${key} lists unknown paper "${slug}"`);
   const tagged = (group: TagGroup, slug: string) => Object.keys(group).filter((k) => (group[k].papers ?? []).includes(slug));
   const papers: Paper[] = entries.map((p) => ({
     ...p,
@@ -96,6 +122,17 @@ export function teaserUrl(paper: Paper): string | undefined {
   const found = names.find((n) => existsSync(join(publicDir, "papers", paper.id, n)));
   if (paper.data.teaser && !found) throw new Error(`papers/${paper.id}.md: teaser "${paper.data.teaser}" not found in public/papers/${paper.id}/`);
   return found && `/papers/${paper.id}/${found}`;
+}
+
+/**
+ * URL of a paper's mini teaser (teaser-mini.png/.jpg/.jpeg/.webp in the same folder), the small
+ * version used on paper cards and lists. Falls back to the full teaser when there is no mini.
+ */
+export function teaserMiniUrl(paper: Paper): string | undefined {
+  const found = ["teaser-mini.png", "teaser-mini.jpg", "teaser-mini.jpeg", "teaser-mini.webp"].find((n) =>
+    existsSync(join(publicDir, "papers", paper.id, n)),
+  );
+  return found ? `/papers/${paper.id}/${found}` : teaserUrl(paper);
 }
 
 /**
@@ -137,8 +174,8 @@ export async function getThemes(): Promise<Theme[]> {
   const papers = new Set((await getCollection("papers")).map((p) => p.id));
   for (const t of themes)
     for (const slug of t.data.selected)
-      if (!papers.has(slug)) throw new Error(`themes.yaml: ${t.id} selects unknown paper "${slug}"`);
-  return themes; // themes.yaml order is display order
+      if (!papers.has(slug)) throw new Error(`research-themes.yaml: ${t.id} selects unknown paper "${slug}"`);
+  return themes; // research-themes.yaml order is display order
 }
 
 /** Lab members keyed by full name, used to link and underline authors. */

@@ -1,10 +1,10 @@
 ---
 /**
- * A paper's teaser image from public/papers/<slug>/ (see teaserUrl). Papers
+ * A paper's teaser image from public/papers/<slug>/ (see teaserUrl; `mini` uses teaserMiniUrl). Papers
  * without one get a contour "map tile" in their theme color with the short name on it.
  */
 import type { Paper } from "../lib/site";
-import { getThemes, teaserUrl } from "../lib/site";
+import { getThemes, teaserMiniUrl, teaserUrl } from "../lib/site";
 import Contours from "./Contours.astro";
 import { tileSpec } from "../graphics/contourSets";
 import PublicImage from "./PublicImage.astro";
@@ -16,11 +16,13 @@ interface Props {
   class?: string;
   loading?: "lazy" | "eager";
   priority?: boolean;
+  /** Use the small teaser-mini image (cards and lists) instead of the full teaser. */
+  mini?: boolean;
 }
 
-const { paper, width, class: className, loading = "lazy", priority = false } = Astro.props;
+const { paper, width, class: className, loading = "lazy", priority = false, mini = false } = Astro.props;
 const { teaserAlt, short, themes } = paper.data;
-const teaser = teaserUrl(paper);
+const teaser = mini ? teaserMiniUrl(paper) : teaserUrl(paper);
 const allThemes = await getThemes();
 const color = allThemes.find((t) => t.id === themes[0])?.data.color ?? "ink-2";
 ---
