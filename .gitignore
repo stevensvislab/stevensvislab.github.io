@@ -1,5 +1,3 @@
-website-notes/
-
 # build output and dependencies
 node_modules/
 dist/
