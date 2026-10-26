@@ -45,7 +45,7 @@ const Photo = p.links.site ? "a" : "div";
   </Photo>
   <div class="info">
     <h3 class="name">{p.links.site ? <a href={p.links.site}>{p.name}</a> : p.name}</h3>
-    <p class="role">{p.role}</p>
+    <p class="role">{p.role}{p.company && ` • ${p.company}`}</p>
     {p.now_at && <p class="now">Now at {p.now_at}</p>}
     {p.interests && <p class="interests">{p.interests}</p>}
     {
@@ -103,15 +103,15 @@ const Photo = p.links.site ? "a" : "div";
     font-weight: 700;
     text-shadow: 1px 1px 3px #000;
   }
-  .info { display: flex; flex-direction: column; gap: 0.1rem; }
+  .info { display: flex; flex-direction: column; gap: 0; }
   .name { font-family: var(--font-body); font-size: 1.02rem; font-weight: 800; margin: 0; letter-spacing: 0; }
   .name a { text-decoration: none; }
   .name a:hover { text-decoration: underline; }
-  .role { margin: 0; font-style: italic; color: var(--ink-2); font-size: 0.9rem; }
+  .role { margin: 0.3rem 0 0; font-style: italic; color: var(--ink-2); font-size: 0.9rem; line-height: 1.3; }
   .now { margin: 0; font-size: 0.85rem; color: var(--ink-2); }
-  .interests { margin: 0.15rem 0 0; font-size: 0.83rem; color: var(--muted); line-height: 1.45; }
-  .links { list-style: none; display: flex; gap: 0.15rem; margin: 0.35rem 0 0 -0.35rem; padding: 0; }
-  .links a { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 7px; color: var(--ink-2); }
+  .interests { margin: 0.3rem 0 0; font-size: 0.83rem; color: var(--muted); line-height: 1.45; }
+  .links { list-style: none; display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.35rem 0 0 -0.25rem; padding: 0; }
+  .links a { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; color: var(--ink-2); }
   .links a:hover { background: var(--paper-2); color: var(--stevens); }
   @media (max-width: 560px) {
     .person { flex-direction: row; align-items: flex-start; gap: 0.9rem; }

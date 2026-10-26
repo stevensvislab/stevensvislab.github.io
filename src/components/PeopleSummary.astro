@@ -1,7 +1,7 @@
 ---
 /**
- * Home-page summary of the team: a small photo, name, and role for each current
- * member (same order as /people/), ending with an open spot that links to Join.
+ * Home-page summary of the team: a small photo, name, and role for everyone on
+ * the People page except the pets (same order as /people/), ending with an open spot that links to Join.
  */
 import { getCollection } from "astro:content";
 import Contours from "./Contours.astro";
@@ -10,7 +10,7 @@ import Icon from "./Icon.astro";
 import PublicImage from "./PublicImage.astro";
 import { publicFile } from "../lib/site";
 
-const order = ["faculty", "phd", "ms", "undergrad"] as const;
+const order = ["faculty", "phd", "ms", "undergrad", "visiting"] as const;
 const members = (await getCollection("people"))
   .filter((p) => (order as readonly string[]).includes(p.data.group))
   .sort(

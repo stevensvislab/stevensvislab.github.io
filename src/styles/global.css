@@ -307,7 +307,7 @@ svg.icon {
 }
 /* Icon at the end of the subtitle text. */
 .page-head .subtitle .icon {
-  margin-left: 0.1rem;
+  margin-left: 0.45rem;
   vertical-align: -0.2em;
 }
 /* Icon after a title that has no subtitle (About, Join). */

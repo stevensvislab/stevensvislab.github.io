@@ -121,6 +121,7 @@ const people = defineCollection({
     name: z.string(),
     first: z.string(),
     role: z.string(),
+    company: z.string().optional(), // second subtitle under the role (People page), e.g. a company or lab
     group: z.enum(["faculty", "phd", "ms", "undergrad", "visiting", "alumni", "pet"]),
     photo: z.string().optional(), // file in public/people/
     interests: z.string().optional(),

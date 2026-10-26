@@ -10,6 +10,7 @@
 #   name: Jane Doe                             # must match the spelling in paper author lists
 #   first: Jane                                # shown on the photo
 #   role: PhD Student, CS
+#   company: Company or lab                    # optional: shown after the role, e.g. "PhD Student, CS • Company"
 #   group: phd
 #   photo: jane-doe.jpg
 #   interests: Visual analytics, Knowledge graphs, Rock climbing
@@ -28,22 +29,44 @@
 - id: adam-coscia
   name: Adam Coscia
   first: Adam
-  role: Assistant Professor, CS
+  role: Asst Professor, CS
+  company: Stevens
   group: faculty
   photo: adam-coscia.png
-  interests: Visual Analytics, Sensemaking, AI, Coffee, Snowboarding
+  interests: visual analytics, sensemaking, ai, coffee, snowboarding
   links:
     site: https://adamcoscia.com
     email: acoscia@stevens.edu
     scholar: https://scholar.google.com/citations?user=diVuti8AAAAJ
-    linkedin: https://www.linkedin.com/in/adam-coscia/
     github: https://github.com/AdamCoscia
+    x: https://x.com/adamcoscia
+    bluesky: https://bsky.app/profile/adamcoscia.bsky.social
+    linkedin: https://www.linkedin.com/in/adam-coscia/
   start: 2026
 
 - id: meng-tang
   name: Meng Lincoln Ngy Tang
   first: Meng
   role: Undergrad, CS
+  company: Stevens
   group: undergrad
-  interests: Financial visualization, Lending
+  interests: multi-document analysis, visual analytics, sensemaking
+  start: 2026
+
+- id: eve-zhang
+  name: Xinge (Eve) Zhang
+  first: Eve
+  role: Intern
+  company: Iteris
+  group: visiting
+  interests: ai reliance, collaboration, visual analytics, traffic
+  start: 2026
+
+- id: astha-shah
+  name: Astha Shah
+  first: Astha
+  role: Intern
+  company: Wayfair
+  group: visiting
+  interests: ai in education, sensemaking, visual learning tools
   start: 2026
