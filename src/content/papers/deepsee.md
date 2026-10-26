@@ -13,7 +13,7 @@ teaserAlt: DeepSee workspace showing seafloor maps with sediment sampling histor
 links:
   pdf: https://arxiv.org/abs/2403.04761
   doi: https://doi.org/10.1145/3613904.3642001
-  demo: https://www.its.caltech.edu/~datavis/deepsee/
+  demo: https://d2d.caltech.edu/projects/deepsee/
   talk: https://youtu.be/FqJIZJqfeTM
   slides: /papers/deepsee/Coscia_DeepSee_CHI_May2024.pdf
   video: https://youtu.be/HJ4zbueJ9cs
