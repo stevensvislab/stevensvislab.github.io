@@ -4,14 +4,12 @@ import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
 import JoinCard from "../components/JoinCard.astro";
 import PersonCard from "../components/PersonCard.astro";
+import { comparePeople } from "../lib/site";
 
 const people = await getCollection("people");
-// Faculty, then PhD, master's, and undergraduate students; alphabetical within a group.
-const order = ["faculty", "phd", "ms", "undergrad"] as const;
-const members = people
-  .filter((p) => (order as readonly string[]).includes(p.data.group))
-  .sort((a, b) => order.indexOf(a.data.group as (typeof order)[number]) - order.indexOf(b.data.group as (typeof order)[number]) || a.data.name.localeCompare(b.data.name));
-const visiting = people.filter((p) => p.data.group === "visiting");
+// `group` picks the section; within it, people sort by degree level, then alphabetically (see comparePeople).
+const members = people.filter((p) => p.data.group === "faculty" || p.data.group === "core").sort(comparePeople);
+const visiting = people.filter((p) => p.data.group === "visiting").sort(comparePeople);
 const alumni = people.filter((p) => p.data.group === "alumni").sort((a, b) => (b.data.end ?? 0) - (a.data.end ?? 0));
 const pets = people.filter((p) => p.data.group === "pet");
 ---
@@ -47,8 +45,7 @@ const pets = people.filter((p) => p.data.group === "pet");
           <ul class="alumni">
             {alumni.map((p) => (
               <li id={p.id}>
-                <b>{p.data.links.site ? <a href={p.data.links.site}>{p.data.name}</a> : p.data.name}</b> ({p.data.role}
-                {p.data.start && `, ${p.data.start}–${p.data.end ?? ""}`}){p.data.now_at && <> — now at {p.data.now_at}</>}
+                <b>{p.data.links.site ? <a href={p.data.links.site}>{p.data.name}</a> : p.data.name}</b> ({[p.data.position ?? p.data.education, p.data.start && `${p.data.start}–${p.data.end ?? ""}`].filter(Boolean).join(", ")}){p.data.now_at && <> — now at {p.data.now_at}</>}
               </li>
             ))}
           </ul>

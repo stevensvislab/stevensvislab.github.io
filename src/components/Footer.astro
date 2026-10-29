@@ -36,7 +36,7 @@ const editUrl = editPath ? `${site.editBase}/${editPath}` : site.editBase.replac
     <div class="wrap inner">
       <div class="col marks">
         <a class="stevens-card" href={site.institution.url} rel="noopener">
-          <img src="/logos/Stevens-Primary-Logo-2020_4C.svg" alt={site.institution.name} width="180" height="60" loading="lazy" />
+          <img src="/logos/stevens-logo.svg" alt={site.institution.name} width="130" height="180" loading="lazy" />
         </a>
         <p class="small">
           <a href={site.institution.schoolUrl} rel="noopener">{site.institution.school}</a><br />
@@ -73,6 +73,10 @@ const editUrl = editPath ? `${site.editBase}/${editPath}` : site.editBase.replac
             </a>
           </li>
         </ul>
+        <p class="small disclaimer">
+          This website and lab is informally maintained by the affiliated faculty and students and does not officially
+          represent Stevens Institute of Technology.
+        </p>
       </div>
     </div>
     <p class="wrap map-label mono">
@@ -101,28 +105,26 @@ const editUrl = editPath ? `${site.editBase}/${editPath}` : site.editBase.replac
   .inner {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    gap: 2rem;
+    gap: 2rem 3rem; /* row gap, column gap */
     align-items: start;
   }
   .col { display: flex; flex-direction: column; gap: 0.5rem; }
   .marks { align-items: flex-start; }
   .community { align-items: center; text-align: center; }
-  .meta { align-items: flex-end; }
-  .stevens-card {
-    display: inline-block;
-    background: #fff;
-    border-radius: 10px;
-    padding: 0.6rem 0.9rem;
-  }
-  .stevens-card img { width: 170px; height: auto; }
+  /* Stretch to the row's height so the disclaimer lines up with the bottom of the Stevens address on the left. */
+  .meta { align-items: flex-end; align-self: stretch; justify-content: space-between; }
+  /* The logo is white artwork made for dark backgrounds, so it sits directly on the footer. */
+  .stevens-card { display: inline-block; }
+  .stevens-card img { display: block; height: 180px; width: auto; }
   .small { font-size: 0.86rem; color: var(--night-muted); margin: 0; line-height: 1.55; }
+  .disclaimer { max-width: 22rem; margin-top: 3rem; text-align: right; }
   .hello { font-family: var(--font-display); font-size: 1.3rem; margin: 0.2rem 0 0.1rem; }
   .copy { font-size: 0.8rem; }
   .copy :global(.vis) { color: #f08a99; }
   a { color: var(--night-ink); text-decoration-color: color-mix(in srgb, var(--night-ink) 35%, transparent); }
   a:hover { color: #fff; text-decoration-color: #fff; }
   :global(.footer-logo) { color: var(--night-ink); }
-  .socials { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+  .socials { list-style: none; margin: 0; padding: 1.5rem 0 0; display: grid; gap: 0.45rem; }
   .socials a { display: inline-flex; align-items: center; gap: 0.55rem; font-size: 0.88rem; text-decoration: none; }
   .map-label {
     display: flex;
@@ -138,6 +140,7 @@ const editUrl = editPath ? `${site.editBase}/${editPath}` : site.editBase.replac
   @media (max-width: 760px) {
     .inner { grid-template-columns: 1fr; text-align: left; }
     .community, .meta { align-items: flex-start; text-align: left; }
+    .disclaimer { text-align: left; margin-top: 2rem; }
     .map-label { justify-content: flex-start; }
   }
 </style>

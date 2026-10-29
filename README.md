@@ -142,8 +142,10 @@ Each tag lists the papers it applies to and are used site-wide. All tags live in
 - id: jane-doe # used in links: /people/#jane-doe
   name: Jane Doe # must match the spelling in paper author lists
   first: Jane # shown on the photo
-  role: PhD Student, CS
-  group: phd # faculty | phd | ms | undergrad | visiting | alumni | pet
+  group: core # page section: faculty | core | visiting | alumni | pet
+  degree: phd # sorts within a section: postdoc | phd | ms | undergrad
+  position: Engineer@Company # optional: company position or research program
+  education: CS BS, University # degree, university
   photo: jane-doe.jpg # optional: file in public/people/; a contour placeholder is shown if missing
   interests: Visual analytics, Knowledge graphs, Rock climbing
   links: # all optional; allowed: site, email, scholar, github, linkedin, bluesky, x

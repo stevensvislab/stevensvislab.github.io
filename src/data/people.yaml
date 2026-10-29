@@ -1,6 +1,5 @@
 # Lab members
 #
-# group (decides the section): faculty | phd | ms | undergrad | visiting | alumni | pet
 # photo: a square image in public/people/ (about 500×500 px). Leave it out to show a contour placeholder.
 # links (all optional): site, email, scholar, github, linkedin, bluesky, x. Any other key fails the build.
 # When someone graduates: set `group: alumni`, and add `end` and `now_at`.
@@ -9,9 +8,10 @@
 # - id: jane-doe                               # used in links: /people/#jane-doe
 #   name: Jane Doe                             # must match the spelling in paper author lists
 #   first: Jane                                # shown on the photo
-#   role: PhD Student, CS
-#   company: Company or lab                    # optional: shown after the role, e.g. "PhD Student, CS • Company"
-#   group: phd
+#   group: core                                # faculty | core | alumni | visiting | pet (pets only take id, name, first, group, photo)
+#   degree: PhD                                # postdoc | phd | ms | undergrad
+#   position: Engineer@Company                 # OPTIONAL: company position or research program; e.g., AIRS
+#   education: CS BS, University               # degree, university
 #   photo: jane-doe.jpg
 #   interests: Visual analytics, Knowledge graphs, Rock climbing
 #   links:
@@ -29,9 +29,10 @@
 - id: adam-coscia
   name: Adam Coscia
   first: Adam
-  role: Asst Professor, CS
-  company: Stevens
   group: faculty
+  degree: phd
+  position: Prof
+  education: HCC PhD, GT
   photo: adam-coscia.png
   interests: visual analytics, sensemaking, ai, coffee, snowboarding
   links:
@@ -47,26 +48,29 @@
 - id: meng-tang
   name: Meng Lincoln Ngy Tang
   first: Meng
-  role: Undergrad, CS
-  company: Stevens
-  group: undergrad
+  group: core
+  degree: undergrad
+  position:
+  education: CS Undergrad
   interests: multi-document analysis, visual analytics, sensemaking
   start: 2026
 
 - id: eve-zhang
   name: Xinge (Eve) Zhang
   first: Eve
-  role: Intern
-  company: Iteris
   group: visiting
+  degree: ms
+  position: Engineer@Iteris
+  education: Urban Analytics MS, UPenn
   interests: ai reliance, collaboration, visual analytics, traffic
   start: 2026
 
 - id: astha-shah
   name: Astha Shah
   first: Astha
-  role: Intern
-  company: Wayfair
   group: visiting
+  degree: undergrad
+  position: SWE@Wayfair
+  education: CS Undergrad, Tufts
   interests: ai in education, sensemaking, visual learning tools
   start: 2026

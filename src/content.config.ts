@@ -115,14 +115,19 @@ const themes = defineCollection({
   }),
 });
 
+// Pets take only these keys; everyone else needs `degree` and `education` too (checked below).
+const PET_KEYS = ["name", "first", "group", "photo"];
+
 const people = defineCollection({
   loader: file("./src/data/people.yaml"),
-  schema: z.object({
+  schema: z
+    .object({
     name: z.string(),
     first: z.string(),
-    role: z.string(),
-    company: z.string().optional(), // second subtitle under the role (People page), e.g. a company or lab
-    group: z.enum(["faculty", "phd", "ms", "undergrad", "visiting", "alumni", "pet"]),
+    position: z.string().nullish(), // e.g. PhD Student, CS (may be left out or blank)
+    degree: z.enum(["postdoc", "phd", "ms", "undergrad"]).optional(), // required, except for pets; sorts people within a section
+    education: z.string().optional(), // required, except for pets; shown after the position, e.g. a school, company, or lab
+    group: z.enum(["faculty", "core", "visiting", "alumni", "pet"]), // decides the page section
     photo: z.string().optional(), // file in public/people/
     interests: z.string().optional(),
     // Allowed links: site, email, scholar, github, linkedin, bluesky, x. Any other key fails the build.
@@ -140,6 +145,16 @@ const people = defineCollection({
     start: z.number().int().optional(),
     end: z.number().int().optional(),
     now_at: z.string().optional(),
+  })
+  .superRefine((p, ctx) => {
+    if (p.group === "pet") {
+      // `links` defaults to {}, so only a non-empty one counts as set.
+      const extra = Object.entries(p).filter(([k, v]) => !PET_KEYS.includes(k) && v !== undefined && !(k === "links" && !Object.keys(v as object).length));
+      for (const [k] of extra) ctx.addIssue({ code: "custom", path: [k], message: `pets only take id, ${PET_KEYS.join(", ")} (remove "${k}")` });
+    } else {
+      for (const k of ["degree", "education"] as const)
+        if (p[k] === undefined) ctx.addIssue({ code: "custom", path: [k], message: `"${k}" is required (only pets can leave it out)` });
+    }
   }),
 });
 

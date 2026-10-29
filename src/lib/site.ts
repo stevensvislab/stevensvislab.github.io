@@ -178,6 +178,18 @@ export async function getThemes(): Promise<Theme[]> {
   return themes; // research-themes.yaml order is display order
 }
 
+const GROUPS = ["faculty", "core", "visiting", "alumni", "pet"];
+const DEGREES = ["postdoc", "phd", "ms", "undergrad"];
+
+/**
+ * Sort order for people: by group (it decides the page section, faculty first within the members),
+ * then by degree level (postdoc, PhD, master's, undergraduate), then alphabetical.
+ */
+export const comparePeople = (a: Person, b: Person): number =>
+  GROUPS.indexOf(a.data.group) - GROUPS.indexOf(b.data.group) ||
+  DEGREES.indexOf(a.data.degree ?? "") - DEGREES.indexOf(b.data.degree ?? "") ||
+  a.data.name.localeCompare(b.data.name);
+
 /** Lab members keyed by full name, used to link and underline authors. */
 export async function getPeopleByName(): Promise<Map<string, Person>> {
   const people = await getCollection("people");
