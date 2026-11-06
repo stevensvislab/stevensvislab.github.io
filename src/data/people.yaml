@@ -51,8 +51,11 @@
   group: core
   degree: undergrad
   position:
+  photo: mengtang.png
   education: CS Undergrad
   interests: multi-document analysis, visual analytics, sensemaking
+  links:
+    github: https://github.com/ngymengtang
   start: 2026
 
 - id: eve-zhang
