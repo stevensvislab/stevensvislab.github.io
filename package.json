@@ -6,14 +6,13 @@
   "description": "The official website of the Visualization Lab at Stevens Institute of Technology",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node scripts/optimize-images.mjs && node scripts/check-links.mjs",
+    "build": "astro build && node scripts/optimize-images.mjs && node scripts/sitemap.mjs && node scripts/check-links.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
-    "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/national-park": "^5.3.0",
     "@fontsource-variable/nunito-sans": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",

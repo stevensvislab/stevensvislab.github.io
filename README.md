@@ -225,7 +225,7 @@ Most of this is automatic:
 - **Page titles and descriptions** come from the content. A paper's page title is its full title, and its description is the start of its abstract (about 150 characters), so write a clear first sentence. Other pages' descriptions are set at the top of each page file (the `description=` on `<Base>`).
 - **Link previews** (Slack, LinkedIn, X, iMessage) show a card: each paper with a teaser gets one built automatically from it; everything else uses `public/og/default.png` (1200×630). Replace that file when the lab has a logo.
 - **Google Scholar and search engines** get structured data (citation tags and schema.org) on every paper page, built from the paper's front matter.
-- `public/robots.txt` points crawlers to the sitemap, which is generated automatically.
+- `public/robots.txt` points crawlers to `/sitemap.xml`, which `scripts/sitemap.mjs` writes after each build from every page with a canonical link (the 404 page and demos are left out).
 
 ## Credits
 
@@ -235,7 +235,7 @@ The Stevens logo and partner organization logos are trademarks of their respecti
 
 | Library                                                                                    | Use                                           | License    |
 | ------------------------------------------------------------------------------------------ | --------------------------------------------- | ---------- |
-| [Astro](https://astro.build) with `@astrojs/sitemap`, `@astrojs/rss`, `@astrojs/check`     | Site framework, sitemap, RSS feed, type check | MIT        |
+| [Astro](https://astro.build) with `@astrojs/rss`, `@astrojs/check`                         | Site framework, RSS feed, type check          | MIT        |
 | [d3-contour](https://github.com/d3/d3-contour), [d3-shape](https://github.com/d3/d3-shape) | Contours, research map, and footer ridge      | ISC        |
 | [yaml](https://github.com/eemeli/yaml)                                                     | Reading the data files                        | ISC        |
 | [TypeScript](https://www.typescriptlang.org)                                               | Type checking                                 | Apache-2.0 |
